@@ -6,6 +6,7 @@ d = diag(D);
 d(d<0) = 0;
 Sigma = diag(d);
 Z = V*Sigma*V';
+Z = (Z + Z') / 2;
 
 h = norm(Z);
 if h > cccp.epsilon

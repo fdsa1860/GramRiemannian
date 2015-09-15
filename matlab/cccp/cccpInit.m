@@ -1,14 +1,19 @@
-function cccp = cccpInit(I)
+function cccp = cccpInit(W,Y,epsilon)
 
-cccp.X = I;
-cccp.Y = I;
-cccp.W = I;
-cccp.Z = I;
-cccp.B = zeros(size(I));
+cccp.Y = Y;
+cccp.W = W;
+cccp.X = zeros(size(W));
+cccp.X_pre = inf(size(W));
+cccp.Z = zeros(size(W));
+cccp.B = zeros(size(W));
 cccp.mu = 1;
+cccp.muMax = 1e3;
 cccp.rho = 1.1;
-cccp.eta = 1; % optimization stop condition
+cccp.epsilon = 3 * epsilon;
+cccp.eta = 1e-4; % optimization stop condition
+cccp.optVal = inf;
 
-cccp.X_pre = zeros(d);
+% cccp.X_Pool = {};
+% cccp.optVal_Pool = [];
 
 end

@@ -56,8 +56,8 @@ HHt2 = HHt2 / norm(HHt2,'fro');
 % end
 
 %% NN
-Hsize = 105*2;
-opt.metric='JLD';opt.H_structure = 'HHt';
+Hsize = 105*4;
+opt.metric='JLD';opt.H_structure = 'HHt';opt.sigma = 0.9;
 HH = cell(1,length(data));
 for i=1:length(data)
     t = diff(data{i},[],2);
@@ -76,7 +76,7 @@ for i=1:length(data)
     end
     HHt = HHt / norm(HHt,'fro');
     %     HHt = t * t';
-    I = 1e-3*eye(size(HHt));
+    I = opt.sigma * eye(size(HHt));
     HH{i} = HHt + I;
 end
 % get centers
