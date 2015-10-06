@@ -10,7 +10,7 @@ cccp.mu = 1;
 cccp.muMax = 1e3;
 cccp.rho = 1.1;
 cccp.epsilon = 3 * epsilon;
-cccp.eta = 1e-4; % optimization stop condition
+cccp.eta = 1e-6; % optimization stop condition
 cccp.optVal = inf;
 
 % cccp.X_Pool = {};

@@ -25,10 +25,14 @@ for t=1:T
         c2=J(2,j);
         line([x(c1,t) x(c2,t)], [y(c1,t) y(c2,t)], [z(c1,t) z(c2,t)]);
     end    
-    title([num2str(t) '/' num2str(T)]);
-    view(-30,30)
+%     title([num2str(t) '/' num2str(T)]);
+%     axis tight;
+    axis off;
+%     view(-30,30);
     drawnow;
-    pause(0.1);
+%     pause(0.1);
+    t
+    pause;
     35;
 end
 
