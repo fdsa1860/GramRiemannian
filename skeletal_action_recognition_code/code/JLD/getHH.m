@@ -3,11 +3,12 @@ function HH = getHH(features,opt)
 
 s = size(features{1});
 
+% idx = randi(s(1),[500,1]);
+% Hsize = 1*length(idx);
 % Hsize = 540;
-Hsize = 4*s(1);
+Hsize = 1*s(1);
 % Hsize = 7;
 
-sigma = 0.25;
 
 if ~exist('opt','var')
     opt.H_structure = 'HHt';
@@ -17,6 +18,7 @@ end
 HH = cell(1,length(features));
 for i=1:length(features)
     t = diff(features{i},[],2);
+%     if size(t,1)>1000, t=t(idx,:); end % debug only, comment out in release code
     if strcmp(opt.H_structure,'HtH')
         nc = Hsize;
         nr = size(t,1)*(size(t,2)-nc+1);
@@ -32,7 +34,7 @@ for i=1:length(features)
     end
     HHt = HHt / norm(HHt,'fro');
     if strcmp(opt.metric,'JLD')
-        I = sigma*eye(size(HHt));
+        I = opt.sigma*eye(size(HHt));
         HH{i} = HHt + I;
     elseif strcmp(opt.metric,'binlong')
         HH{i} = HHt;

@@ -1,4 +1,4 @@
-function [label,X_center,D,cparams] = ncutJLD(X,k,opt)
+function [label,X_center,D,W,cparams] = ncutJLD(X,k,opt)
 % ncutJLD:
 % perform kmeans clustering on covariance matrices with JLD metric
 % Input:
@@ -14,7 +14,7 @@ D = HHdist(X,[],opt.metric);
 % load sD_MSR_seg_L11;
 % D = sD;
 
-kNN = 5;
+kNN = 20;
 D2 = D;
 for j=1:size(D,1)
     [ignore,ind] = sort(D(:,j));
@@ -25,7 +25,7 @@ D = min(D2,D2');%(B+B')/2;
 % D = max(D2,D2');
 
 scale_sig = 1;
-W = exp(-D.^2/scale_sig);
+W = exp(-D.^2/(2*scale_sig^2));
 NcutDiscrete = ncutW(W, k);
 label = sortLabel_count(NcutDiscrete);
 
@@ -41,13 +41,13 @@ for j=1:k
         elseif nnz(label==j)==0
             error('cluster is empty.\n');
         end
-        d = HHdist(X_center(j),X(label==j),'JLD');
-        d(abs(d)<1e-6) = 1e-6;
-%         param = gamfit(d);
-        phat = mle(d,'pdf',@gampdf,'start',[1 1],'lowerbound',[0 0],'upperbound',[1.5 inf]);
-        cparams(j).alpha = min(100,phat(1));
-        if isinf(cparams(j).alpha), keyboard;end
-        cparams(j).theta = max(0.01,phat(2));
+%         d = HHdist(X_center(j),X(label==j),'JLD');
+%         d(abs(d)<1e-6) = 1e-6;
+% %         param = gamfit(d);
+%         phat = mle(d,'pdf',@gampdf,'start',[1 1],'lowerbound',[0 0],'upperbound',[1.5 inf]);
+%         cparams(j).alpha = min(100,phat(1));
+%         if isinf(cparams(j).alpha), keyboard;end
+%         cparams(j).theta = max(0.01,phat(2));
     elseif strcmp(opt.metric,'binlong')
         X_center{j} = findCenter(X(label==j));
     end

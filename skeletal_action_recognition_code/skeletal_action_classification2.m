@@ -1,4 +1,4 @@
-function [] = skeletal_action_classification(dataset_idx, feature_idx)
+function [] = skeletal_action_classification2(dataset_idx, feature_idx)
 
 dbstop if error
 
@@ -174,12 +174,12 @@ for set = 1:n_action_sets % uncomment if MSR
 %         te_ind = find(indices==si); % comment if not UCF
         
 %         % slide window
-%         [feat_tr,fl_tr] = chopFeature(data.features(tr_ind));
-%         unique_fl_tr = unique(fl_tr);
-%         HH_tr = getHH(feat_tr);
-%         [label,HH_centers,sD,cparams] = ncutJLD(HH_tr,n_classes,opt);
-%         D_tr = HHdist(HH_centers,HH_tr,opt.metric);
-%         [~,label_tr] = min(D_tr);
+        [feat_tr,fl_tr] = chopFeature(data.features(tr_ind));
+        unique_fl_tr = unique(fl_tr);
+        HH_tr = getHH(feat_tr, opt);
+        [label,HH_centers,sD,sW,cparams] = ncutJLD(HH_tr,20,opt);
+        D_tr = HHdist(HH_centers,HH_tr,opt.metric);
+        [~,label_tr] = min(D_tr);
 %         hFeat_tr = zeros(n_classes,length(unique_fl_tr));
 %         for i = 1:length(unique_fl_tr)
 %             hFeat_tr(:,i) = hist(label_tr(fl_tr==unique_fl_tr(i)),1:n_classes);
@@ -206,65 +206,17 @@ for set = 1:n_action_sets % uncomment if MSR
         X_test = HH(te_ind);
         nTest = length(X_test);
         y_test = action_labels(te_ind);
-        unique_classes = unique(y_train);
-        n_classes = length(unique_classes);
-%         % train NN
-% %         D = HHdist(X_train,X_train,opt.metric); % uncomment if opt.metric=='binlong'
-% %         centerInd = findCenters(D,y_train); % uncomment if opt.metric=='binlong'
-% %         HH_center = X_train(centerInd); % uncomment if opt.metric=='binlong'
-%         HH_center = cell(1, n_classes);
-% %         cparams(1:n_classes) = struct ('prior',0,'alpha',0,'theta',0);
-%         for ai = 1:n_classes
-%             X_tmp = X_train(y_train==unique_classes(ai));
-% %             HH_center{ai} = karcher(X_tmp{1:end});
-% %             HH_center{ai} = karchermean(X_tmp);
-%             HH_center{ai} = steinMean(cat(3,X_tmp{1:end}));
-% %             HH_center{ai} = incSteinMean(cat(3,X_tmp{1:end}));
-% %             d = HHdist(HH_center(ai),X_tmp,opt.metric);
-% %             d(abs(d)<1e-6) = 1e-6;
-% % %             phat = gamfit(d);
-% %             phat = mle(d,'pdf',@gampdf,'start',[1 1],'lowerbound',[0 0],'upperbound',[1.5 inf]);
-% %             cparams(ai).alpha = min(100,phat(1));
-% %             if isinf(cparams(ai).alpha), keyboard;end
-% %             cparams(ai).theta = max(0.01,phat(2));
-% %             cparams(ai).prior = length(X_tmp) / length(X_train);
-%             fprintf('processed %d/%d\n',ai,n_classes);
-%         end
-%         % test NN
-%         D2 = HHdist(HH_center,X_test,opt.metric);
-%         [~,ind] = min(D2);
-%         predicted_labels = unique_classes(ind);
 
-%         % test gamma voting
-%         D2 = HHdist(HH_center,X_test,opt.metric);
-%         P2 = zeros(size(D2));
-%         for ai = 1:size(D2,1)
-%             P2(ai,:) = gampdf(D2(ai,:),...
-%                 cparams(ai).alpha, cparams(ai).theta);
-%         end
-%         [~,ind] = max(P2);
-%         predicted_labels = unique_classes(ind);
-
-        % test KNN
-        K = 10;
-        D2 = HHdist(X_train, X_test, opt.metric);
-        [D1,ind] = sort(D2);
-        topLabel = y_train(ind(1:K,:));
-%         predicted_labels = mode(topLabel)';
-        topDist = D1(1:K,:);
-        W = 1./(topDist.^2);
-        predicted_labels = zeros(length(X_test),1);
-        for i = 1:size(topLabel,2)
-            uL = unique(topLabel(:,i));
-            wUL = zeros(length(uL),1);
-            for j = 1:length(uL)
-                wUL(j) = sum(W(topLabel(:,i)==uL(j),i));
-            end
-            [~,ii] = max(wUL);
-            predicted_labels(i) = uL(ii);
-        end
         
+        % train NN
+%         predicted_labels = nn(X_train, y_train, X_test, opt);
+
+%         % test KNN
+%         predicted_labels = knn(X_train, y_train, X_test, opt);
+
         total_accuracy(si) = nnz(y_test==predicted_labels)/ length(y_test);
+        unique_classes = unique(y_test);
+        n_classes = length(unique_classes);
         class_wise_accuracy = zeros(1, n_classes);
         confusion_matrix = zeros(n_classes, n_classes);
         for i = 1:n_classes
@@ -370,62 +322,4 @@ for set = 1:n_action_sets % uncomment if MSR
         'avg_cw_accuracy', 'confusion_matrices', 'avg_confusion_matrix');
 % end % comment if MSR OR UCF
 
-%     %% Temporal modeling
-%     disp ('Temporal modeling')
-%     labels = load([directory, '/labels'], 'action_labels', 'subject_labels');
-%
-%     n_actions = length(unique(labels.action_labels));
-
-%     mkdir([directory, '/dtw_warped_features']);
-%     mkdir([directory, '/dtw_warped_fourier_features']);
-%     mkdir([directory, '/dtw_warped_pyramid_lf_fourier_kernels']);
-%
-%     for tr_split = 1:n_tr_te_splits
-%         for tr_action = 1:n_actions
-%             % DTW
-%             loadname = [directory, '/features'];
-%             data = load(loadname, 'features');
-%
-%             savename = [directory, '/dtw_warped_features/warped_features_split_',...
-%                 num2str(tr_split), '_class_', num2str(tr_action)];
-%
-%             get_warped_features(data.features, labels.action_labels,...
-%                 labels.subject_labels, tr_info.tr_subjects(tr_split, :), tr_action, savename);
-%
-%
-%             % Fourier feature computation
-%             loadname = [directory, '/dtw_warped_features/warped_features_split_',...
-%                 num2str(tr_split), '_class_', num2str(tr_action)];
-%             data = load(loadname, 'warped_features');
-%
-%             savename = [directory, '/dtw_warped_fourier_features/warped_fourier_features_split_',...
-%                 num2str(tr_split), '_class_', num2str(tr_action)];
-%
-%             generate_fourier_features(data.warped_features, savename, desired_frames);
-%
-%
-%             % Compute linear kernel from fourier features
-%             loadname = [directory, '/dtw_warped_fourier_features/warped_fourier_features_split_',...
-%                 num2str(tr_split), '_class_', num2str(tr_action)];
-%             data = load(loadname);
-%
-%             savename = [directory, '/dtw_warped_pyramid_lf_fourier_kernels/',...
-%                 'warped_pyramid_lf_fourier_kernels_split_',...
-%                 num2str(tr_split), '_class_', num2str(tr_action)];
-%
-%             compute_kernels(data.pyramid_lf_fourier_features, savename);
-%         end
-%     end
-
-
-% %% Classification
-% disp ('Classification')
-% perform_classification(directory, labels.subject_labels, labels.action_labels,...
-%     tr_info.tr_subjects, tr_info.te_subjects);
-% 
-% if (strcmp(datasets{dataset_idx}, 'MSRAction3D'))
-%     perform_classification_with_subsets(directory, labels.subject_labels,...
-%         labels.action_labels, tr_info.tr_subjects, tr_info.te_subjects,...
-%         tr_info.action_sets);
-% end
 end
