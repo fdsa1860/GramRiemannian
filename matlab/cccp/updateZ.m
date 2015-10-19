@@ -1,7 +1,8 @@
 function cccp = updateZ(cccp)
 
 Z = cccp.X + cccp.B;
-[V,D] = eig(Z);
+I = eye(size(Z));
+[V,D] = eig(Z,I);
 d = diag(D);
 d(d<0) = 0;
 Sigma = diag(d);

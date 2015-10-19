@@ -10,7 +10,7 @@ k = length(uniLabel);
 
 centerInd = zeros(k ,1);
 for i = 1:k
-    ind = find(label==i);
+    ind = find(label==uniLabel(i));
     M = D(ind,ind);
     sd = sum(M);
     [~,index] = min(sd);

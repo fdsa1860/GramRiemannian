@@ -8,7 +8,7 @@ function [label,X_center,D] = kmeansJLD(X,k,opt)
 % label: the clustered labeling results
 
 N = length(X);
-D = zeros(k,N);
+% D = zeros(k,N);
 ind = randsample(N,k);
 X_center = X(ind);
 label = ones(1,N);
@@ -16,33 +16,38 @@ label_old = zeros(1,N);
 
 iter = 0;
 iter_max = 100;
-while iter<iter_max && nnz(label-label_old)~=0
+labelChangeThreshold = N * 0.01;
+while iter<iter_max && nnz(label-label_old)>labelChangeThreshold
     
-    for i=1:k
-        for j=1:N
-            if strcmp(opt.metric,'JLD')
-                HH1 = X_center{i};
-                HH2 = X{j};
-                D(i,j) = log(det((HH1+HH2)/2)) - 0.5*log(det(HH1)) - 0.5*log(det(HH2));
-            elseif strcmp(opt.metric,'binlong')
-                D(i,j) = 2 - norm(X{i}+X_center{j},'fro');
-            end
-        end
-    end
+%     for i=1:k
+%         for j=1:N
+%             if strcmp(opt.metric,'JLD')
+%                 HH1 = X_center{i};
+%                 HH2 = X{j};
+%                 D(i,j) = log(det((HH1+HH2)/2)) - 0.5*log(det(HH1)) - 0.5*log(det(HH2));
+%             elseif strcmp(opt.metric,'binlong')
+%                 D(i,j) = 2 - norm(X{i}+X_center{j},'fro');
+%             end
+%         end
+%     end
+    D = HHdist(X_center, X, opt);
     label_old = label;
     [~,label] = min(D);
     for j=1:k
         if strcmp(opt.metric,'JLD')
 %             X_center{j} = karcher(X{label==j});
 %             X_center{j} = BhattacharyyaMean(X{label==j});
-%             X_center{j} = steinMean(cat(3,X{label==j}));
-            X_center{j} = findCenter(X(label==j),opt);
+            X_center{j} = steinMean(cat(3,X{label==j}));
+%             X_center{j} = findCenter(X(label==j),opt);
         elseif strcmp(opt.metric,'binlong')
             X_center{j} = findCenter(X(label==j));
         end
+        if isempty(X_center{j})
+            X_center(j) = X(randsample(N,1));
+        end
     end
     iter = iter + 1;
-    fprintf('iter %d ...\n',iter);
+    fprintf('iter %d ... label # changed %d ... \n',iter,nnz(label-label_old));
 end
 
 if iter==iter_max
@@ -67,7 +72,7 @@ function center = findCenter(X,opt)
 %     end
 % end
 % D = D + D';
-D = HHdist(X,[],opt.metric);
+D = HHdist(X,[],opt);
 d = sum(D);
 [~,ind] = min(d);
 center = X{ind};

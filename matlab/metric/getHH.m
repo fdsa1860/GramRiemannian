@@ -33,7 +33,8 @@ for i=1:length(features)
         HHt = Ht * Ht';
     end
     HHt = HHt / norm(HHt,'fro');
-    if strcmp(opt.metric,'JLD')
+    if strcmp(opt.metric,'JLD') || strcmp(opt.metric,'JLD_denoise') ...
+            || strcmp(opt.metric,'AIRM')
         I = opt.sigma*eye(size(HHt));
         HH{i} = HHt + I;
     elseif strcmp(opt.metric,'binlong')

@@ -9,7 +9,7 @@ function [label,X_center,D,cparams] = ncutJLD(X,k,opt)
 
 % N = length(X);
 % D2 = zeros(N);
-D = HHdist(X,[],opt.metric);
+D = HHdist(X,[],opt);
 D = D - min(D(:));
 % load sD;
 % D = sD;

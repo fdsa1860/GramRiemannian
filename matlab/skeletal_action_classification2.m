@@ -95,10 +95,13 @@ loadname = [directory, '/features'];
 data = load(loadname, 'features');
 
 opt.metric = 'JLD';
+% opt.metric = 'JLD_denoise';
 % opt.metric = 'binlong';
+% opt.metric = 'AIRM';
 opt.H_structure = 'HHt';
-opt.sigma = 0.25;
+opt.sigma = 0.01;
 % opt.sigma = 0.25; % MSR parameter
+opt.epsilon = 1;
 
 HH = getHH(data.features,opt);
 % HH_main = getHH_local(data.features);
@@ -116,7 +119,7 @@ HH = getHH(data.features,opt);
 % action_labels(action_labels==20) = [];
 
 k = 4;
-C_val = 1e5;
+C_val = 1e-2;
 results_dir = fullfile('..','expData','res');
 for set = 1:n_action_sets % uncomment if MSR
 % for set = 3
@@ -134,24 +137,8 @@ for set = 1:n_action_sets % uncomment if MSR
 %     actions = unique(action_labels);%  comment if MSR
 %     n_classes = length(unique(actions));% comment if MSR
 
-%     % comment if do not want clustering
-%     % clustering
-%     [label,HH_centers,sD] = ncutJLD(HH(action_ind),n_classes,opt);
-%     gt = action_labels(action_ind)';
-%     v = perms(actions);
-%     acc = zeros(1,size(v,1));
-%     for i = 1:length(acc)
-%         acc(i) = nnz(v(i,label)==gt)/length(gt);
-%     end
-%     [accuracy,ind] = max(acc);
-%     accuracy
-%     label = v(ind,label);
-%     confusion_matrix = zeros(n_classes, n_classes);
-%     for i = 1:n_classes
-%         temp = find(gt == actions(i));
-%         confusion_matrix(i, :) = hist(label(temp), actions) / length(temp);
-%     end
-    
+    % clustering
+%     clustering(HH(action_ind),n_classes,opt);
     
     total_accuracy = zeros(n_tr_te_splits, 1);
     cw_accuracy = zeros(n_tr_te_splits, n_classes);
@@ -174,32 +161,34 @@ for set = 1:n_action_sets % uncomment if MSR
 %         tr_ind = find(indices~=si); % comment if not UCF
 %         te_ind = find(indices==si); % comment if not UCF
         
-%         % slide window
+        % slide window
+        numWords = 20;
+        noiseBound = 2;
 %         [feat_tr,fl_tr] = chopFeature(data.features(tr_ind));
-%         unique_fl_tr = unique(fl_tr);
-%         HH_tr = getHH(feat_tr, opt);
-%         [label,HH_centers,sD,cparams] = ncutJLD(HH_tr,20,opt);
-%         D_tr = HHdist(HH_centers,HH_tr,opt.metric);
-%         [~,label_tr] = min(D_tr);
-%         hFeat_tr = zeros(n_classes,length(unique_fl_tr));
-%         for i = 1:length(unique_fl_tr)
-%             hFeat_tr(:,i) = hist(label_tr(fl_tr==unique_fl_tr(i)),1:n_classes);
-%         end
+%         [feat_tr,fl_tr] = breakFeature(data.features(tr_ind));
+        [feat_tr,fl_tr] = breakFeature2(data.features(tr_ind));
+%         [feat_tr, fl_tr] = filterStaticData(feat_tr, fl_tr, noiseBound);
+        HH_tr = getHH(feat_tr, opt);
+%         [label,HH_centers,sD,cparams] = ncutJLD(HH_tr,numWords,opt);
+        tic
+        [label,HH_centers,sD] = kmeansJLD(HH_tr,numWords,opt);
+        toc
+%         feat_tr = bowFeature(HH_centers, HH_tr, fl_tr, opt);
+        feat_tr = vladFeature(HH_centers, HH_tr, fl_tr, opt);
 %         [feat_te,fl_te] = chopFeature(data.features(te_ind));
-%         unique_fl_te = unique(fl_te);
-%         HH_te = getHH(feat_te);
-%         D_te = HHdist(HH_centers,HH_te,opt.metric);
-%         [~,label_te] = min(D_te);
-%         hFeat_te = zeros(n_classes,length(unique_fl_te));
-%         for i = 1:length(unique_fl_te)
-%             hFeat_te(:,i) = hist(label_te(fl_te==unique_fl_te(i)),1:n_classes);
-%         end
-%         X_train = hFeat_tr;
-%         y_train = action_labels(tr_ind);
-%         X_test = hFeat_te;
-%         y_test = action_labels(te_ind);
-%         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] =...
-%             svm_one_vs_all(X_train, X_test, y_train, y_test, C_val);
+%         [feat_te,fl_te] = breakFeature(data.features(te_ind));
+        [feat_te,fl_te] = breakFeature2(data.features(te_ind));
+%         [feat_te, fl_te] = filterStaticData(feat_te, fl_te, noiseBound);
+        HH_te = getHH(feat_te,opt);
+%         feat_te = bowFeature(HH_centers, HH_te, fl_te, opt);
+        feat_te = vladFeature(HH_centers, HH_te, fl_te, opt);
+        
+        X_train = feat_tr;
+        y_train = action_labels(tr_ind);
+        X_test = feat_te;
+        y_test = action_labels(te_ind);
+        [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] =...
+            svm_one_vs_all(X_train, X_test, y_train, y_test, C_val);
 
         X_train = HH(tr_ind);
         nTrain = length(X_train);
@@ -284,7 +273,7 @@ for set = 1:n_action_sets % uncomment if MSR
 %             cparams = centers(di).cparams;
 %             D2 = HHdist(HH_center,X_test,opt.metric);
 %             for ci=1:n_classes
-% %                 hFeat(di,ci,:) = gampdf(D2(ci,:),cparams(ci).alpha,cparams(ci).theta);
+%                 hFeat(di,ci,:) = gampdf(D2(ci,:),cparams(ci).alpha,cparams(ci).theta);
 %                 hFeat(di,ci,:) = D2(ci,:);
 %             end
 %             
