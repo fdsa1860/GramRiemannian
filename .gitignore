@@ -2,6 +2,7 @@
 .DS_Store
 *.avi
 *.mat
+*.csv
 *Thumbs.db
 expData/
 skeleton_data/
