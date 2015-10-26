@@ -19,6 +19,10 @@ if ~isSymmetric
                 D(i,j) = 2 - norm(HH1{i}+HH2{j},'fro');
             elseif strcmp(opt.metric,'AIRM')
                 D(i,j) = AIRM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'LERM')
+                D(i,j) = LERM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'KLDM')
+                D(i,j) = KLDM(HH1{i},HH2{j});
             end
         end
     end
@@ -35,6 +39,10 @@ else
                 D(i,j) = 2 - norm(HH1{i}+HH2{j},'fro');
             elseif strcmp(opt.metric,'AIRM')
                 D(i,j) = AIRM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'LERM')
+                D(i,j) = LERM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'KLDM')
+                D(i,j) = KLDM(HH1{i},HH2{j});
             end
         end
     end

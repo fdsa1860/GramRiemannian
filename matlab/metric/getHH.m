@@ -2,13 +2,7 @@
 function HH = getHH(features,opt)
 
 s = size(features{1});
-
-% idx = randi(s(1),[500,1]);
-% Hsize = 1*length(idx);
-% Hsize = 540;
-Hsize = 5*s(1);
-% Hsize = 7;
-
+Hsize = opt.H_rows * s(1);
 
 if ~exist('opt','var')
     opt.H_structure = 'HHt';
@@ -34,7 +28,8 @@ for i=1:length(features)
     end
     HHt = HHt / norm(HHt,'fro');
     if strcmp(opt.metric,'JLD') || strcmp(opt.metric,'JLD_denoise') ...
-            || strcmp(opt.metric,'AIRM')
+            || strcmp(opt.metric,'AIRM') || strcmp(opt.metric,'LERM')...
+            || strcmp(opt.metric,'KLDM')
         I = opt.sigma*eye(size(HHt));
         HH{i} = HHt + I;
     elseif strcmp(opt.metric,'binlong')

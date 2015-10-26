@@ -29,7 +29,7 @@ for i=1:n_classes
     y_train2(y_train~=unique_classes(i)) = -1;
     class_imbalance_ratio = nnz(y_train2==-1) / nnz(y_train2==1);
     model = svmtrain(y_train2,X_train',sprintf('-s 0 -t 0 -c %d -w1 %f -b 1 -q',C_val,class_imbalance_ratio));
-    [~, ~, prob] = svmpredict(y_test, X_test', model, '-b 1');
+    [~, ~, prob] = svmpredict(y_test, X_test', model, '-b 1 -q');
     test_prediction_prob(i,:) = prob(:,1)';
     svmModel{i} = model;
 end
