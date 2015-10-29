@@ -41,7 +41,7 @@ for si = 1:n_tr_te_splits
     y_test = action_labels(te_ind);
     
     % train NN
-    predicted_labels = nn(X_train, y_train, X_test, opt);
+    [predicted_labels,sD] = nn(X_train, y_train, X_test, opt);
     
     %         % test KNN
     %         predicted_labels = knn(X_train, y_train, X_test, opt);

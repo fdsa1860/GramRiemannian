@@ -6,7 +6,8 @@ function L = logdet( G )
 % Ref: "Efficient Similarity Search for Covariance Matrices 
 % via the Jensen-Bregman LogDet Divergence", A. Cherian et al.
 
-L = log(prod(diag(chol(G)).^2));
+%  L = log(prod(diag(chol(G)).^2));
+L = 2*sum(log(diag(chol(G))));
 
 end
 

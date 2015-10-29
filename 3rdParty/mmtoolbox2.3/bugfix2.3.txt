@@ -1,0 +1,6 @@
+Bugs fixed and updates in version 2.3
+
+14.07.2014 Fixed a bug in the stepsize calculation of karcher.m
+    Removed an unused statement in dist.m (t=1-t)
+    Substituted an inversion by a / in dist.m
+    Substituted cond with rcond for efficiency in dist.m

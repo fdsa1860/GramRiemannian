@@ -83,14 +83,16 @@ action_labels = labels.action_labels;
 loadname = [directory, '/features'];
 data = load(loadname, 'features');
 
-opt.metric = 'JLD';
+% opt.metric = 'JLD';
 % opt.metric = 'JLD_denoise';
 % opt.metric = 'binlong';
-% opt.metric = 'AIRM';
+opt.metric = 'AIRM';
+% opt.metric = 'LERM';
+% opt.metric = 'KLDM';
 opt.H_structure = 'HHt';
 opt.H_rows = 3;
-% opt.sigma = 0.2;
-opt.sigma = 0.25; % MSR parameter
+opt.sigma = 0.25;
+% opt.sigma = 0.25; % MSR parameter
 opt.epsilon = 0.1;
 
 HH = getHH(data.features,opt);

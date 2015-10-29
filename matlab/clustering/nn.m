@@ -1,4 +1,4 @@
-function predicted_labels = nn(X_train, y_train, X_test, opt)
+function [predicted_labels,D2] = nn(X_train, y_train, X_test, opt)
 
 unique_classes = unique(y_train);
 n_classes = length(unique_classes);
@@ -29,7 +29,18 @@ elseif strcmp(opt.metric,'AIRM')
     for ai = 1:n_classes
         X_tmp = X_train(y_train==unique_classes(ai));
         HH_center{ai} = karcher(X_tmp{1:end});
-        %             HH_center{ai} = karchermean(X_tmp);
+    end
+elseif strcmp(opt.metric,'LERM')
+    HH_center = cell(1, n_classes);
+    for ai = 1:n_classes
+        X_tmp = X_train(y_train==unique_classes(ai));
+        HH_center{ai} = logEucMean(X_tmp{1:end});
+    end
+elseif strcmp(opt.metric,'KLDM')
+    HH_center = cell(1, n_classes);
+    for ai = 1:n_classes
+        X_tmp = X_train(y_train==unique_classes(ai));
+        HH_center{ai} = jefferyMean(X_tmp{1:end});
     end
 end
 % test NN

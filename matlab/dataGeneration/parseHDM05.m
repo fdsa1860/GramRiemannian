@@ -6,10 +6,13 @@ function [features, action_labels, subject_labels,instance_labels] = parseHDM05
 addpath(genpath('../3rdParty/HDM05-Parser'))
 
 dataPath = '~/research/data/HDM05_cut_amc';
-action = {'depositFloorR','elbowToKnee1RepsLelbowStart','grabHighR',...
-    'hopBothLegs1hops','jogLeftCircle4StepsRstart','kickLFront1Reps',...
-    'lieDownFloor','rotateArmsBothBackward1Reps','sneak2StepsLStart',...
-    'squat1Reps','throwBasketball'};
+action = {'depositFloorR','elbowToKnee3RepsLelbowStart','grabHighR',...
+    'hopBothLegs3hops','jogLeftCircle4StepsRstart','kickRFront1Reps',...
+    'lieDownFloor','rotateArmsBothBackward3Reps','sneak4StepsRStart',...
+    'squat1Reps','throwBasketball','hopBothLegs1hops', ...
+    'jumpingJack1Reps','throwStandingHighR','sitDownChair',...
+    'standUpSitChair'};
+% action = {'depositFloorR','elbowToKnee1RepsLelbowStart','grabHighR'};
 subject = {'HDM_bd','HDM_bk','HDM_dg','HDM_mm','HDM_tr'};
 
 maxFeatures = 1000;
@@ -28,7 +31,23 @@ for i = 1:length(action)
             jointConf = fullfile(dataPath,sprintf('%s.asf',subject{j}));
             dataFile = fullfile(dataPath,action{i},files(k).name);
             [skel,mot] = readMocap(jointConf, dataFile);
-            features{count} = cell2mat(mot.jointTrajectories);
+            T = cell2mat(mot.jointTrajectories);
+            T = T - repmat(T(1:3,:),mot.njoints,1);
+            for n = 1:size(T,2)
+                hip_axis = T(19:21, n) - T(4:6, n);
+%                 hip_axis = joint_locations(:, body_model.right_hip_index, k) -...
+%                     joint_locations(:, body_model.left_hip_index, k);
+                % Find the rotation matrix that converts the ground plane projection of hip-axis into x-axis
+                R = vrrotvec2mat(vrrotvec([hip_axis(1), 0, hip_axis(3)], [1, 0, 0]));
+                T2 = reshape(T(:,n),3,[]);
+                T3 = R*T2;
+                T(:,n) = T3(:);
+            end
+            for m=1:mot.njoints
+                mot.jointTrajectories{m} = T(3*m-2:3*m,:);
+            end
+            T(1:3,:) = [];
+            features{count} = T;
             instance_labels(count) = k;
             count = count + 1;
             % animate(skel, mot, 1);
