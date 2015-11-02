@@ -11,14 +11,18 @@ if ~isSymmetric
     D = zeros(m,n);
     for i = 1:m
         for j = 1:n
-            if strcmp(opt.metric,'JLD')
-                D(i,j) = log(det((HH1{i}+HH2{j})/2)) - 0.5*log(det(HH1{i})) -0.5*log(det(HH2{j}));
-            elseif strcmp(opt.metric,'JLD_denoise')
+            if strcmp(opt.metric,'JBLD')
+                D(i,j) = JBLD(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'JBLD_denoise')
                 D(i,j) = gramDist_cccp(pcaClean(HH1{i}), HH2{j}, opt);
             elseif strcmp(opt.metric,'binlong')
                 D(i,j) = 2 - norm(HH1{i}+HH2{j},'fro');
             elseif strcmp(opt.metric,'AIRM')
                 D(i,j) = AIRM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'LERM')
+                D(i,j) = LERM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'KLDM')
+                D(i,j) = KLDM(HH1{i},HH2{j});
             end
         end
     end
@@ -27,14 +31,18 @@ else
     D = zeros(m);
     for i = 1:m
         for j = i:m
-            if strcmp(opt.metric,'JLD')
-                D(i,j) = log(det((HH1{i}+HH2{j})/2)) - 0.5*log(det(HH1{i})) -0.5*log(det(HH2{j}));
-            elseif strcmp(opt.metric,'JLD_denoise')
+            if strcmp(opt.metric,'JBLD')
+                D(i,j) = JBLD(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'JBLD_denoise')
                 D(i,j) = gramDist_cccp(pcaClean(HH1{i}), HH2{j}, opt);
             elseif strcmp(opt.metric,'binlong')
                 D(i,j) = 2 - norm(HH1{i}+HH2{j},'fro');
             elseif strcmp(opt.metric,'AIRM')
                 D(i,j) = AIRM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'LERM')
+                D(i,j) = LERM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'KLDM')
+                D(i,j) = KLDM(HH1{i},HH2{j});
             end
         end
     end

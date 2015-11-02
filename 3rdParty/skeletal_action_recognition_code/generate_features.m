@@ -25,6 +25,7 @@ if (strcmp(dataset, 'UTKinect'))
                 if (skeletal_data_validity(action, subject, instance))
                     
                     joint_locations = skeletal_data{action, subject, instance}.joint_locations;
+%                     if size(joint_locations,3) < 20, continue; end
                     features{count} = get_features(feature_type, joint_locations, body_model);
                     action_labels(count) = action;
                     subject_labels(count) = subject;
@@ -35,6 +36,11 @@ if (strcmp(dataset, 'UTKinect'))
             end
         end
     end
+    
+%     features(count:end) = [];
+%     action_labels(count:end) = [];
+%     subject_labels(count:end) = [];
+%     instance_labels(count:end) = [];
     
     save([directory, '/features'], 'features', '-v7.3');
     save([directory, '/labels'], 'action_labels', 'subject_labels', 'instance_labels');

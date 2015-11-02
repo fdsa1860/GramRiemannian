@@ -6,12 +6,13 @@ Hsize = opt.H_rows * s(1);
 
 if ~exist('opt','var')
     opt.H_structure = 'HHt';
-    opt.metric = 'JLD';
+    opt.metric = 'JBLD';
 end
 
 HH = cell(1,length(features));
 for i=1:length(features)
     t = diff(features{i},[],2);
+%     t = features{i};
 %     if size(t,1)>1000, t=t(idx,:); end % debug only, comment out in release code
     if strcmp(opt.H_structure,'HtH')
         nc = Hsize;
@@ -27,7 +28,7 @@ for i=1:length(features)
         HHt = Ht * Ht';
     end
     HHt = HHt / norm(HHt,'fro');
-    if strcmp(opt.metric,'JLD') || strcmp(opt.metric,'JLD_denoise') ...
+    if strcmp(opt.metric,'JBLD') || strcmp(opt.metric,'JBLD_denoise') ...
             || strcmp(opt.metric,'AIRM') || strcmp(opt.metric,'LERM')...
             || strcmp(opt.metric,'KLDM')
         I = opt.sigma*eye(size(HHt));

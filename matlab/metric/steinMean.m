@@ -2,23 +2,34 @@ function X1 = steinMean(X)
 
 
 n = size(X,3);
-dim = size(X,1);
-Y = X(:,:,1);
-X0 = zeros(dim,dim);
 
+X0 = 0;
 for i=1:n
     X0 = X0 + X(:,:,i);
 end
-Y0 = inv(X0./n);
+iY = X0./n;
 
-while JBLD(Y,Y0)>1e-15
-    T = Y;
-    Y = zeros(dim,dim);
+iY0 = X(:,:,1);
+% while norm(iY-iY0)>1e-15
+while JBLD(iY,iY0)>1e-15
+    iY0 = iY;
+    Y = 0;
     for i=1:n
-        Y = Y + inv((inv(Y0)+X(:,:,i))/2);
+        Y = Y + inv((iY0+X(:,:,i))/2);
     end
     Y = Y./n;
-    Y0 = T;
+    iY = inv(Y);
 end
 
-X1 = inv(Y);
+X1 = iY;
+
+end
+
+function T_inv = inverse(T)
+
+[V, D] = schur(T);
+d = diag(D);
+T_inv = V * diag(1./d) * V';
+T_inv = (T_inv + T_inv') / 2;
+
+end

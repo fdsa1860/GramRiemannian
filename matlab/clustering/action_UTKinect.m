@@ -1,19 +1,32 @@
-function action_MSR3D(HH, tr_info, labels, opt)
+function action_UTKinect(HH, tr_info, labels, opt)
 
 feat = HH;
 % feat = getLogHH(HH);
 
 total_preprocessingTime = toc(opt.tStart);
 
-n_tr_te_splits = size(tr_info.tr_subjects, 1);
-tr_subjects = tr_info.tr_subjects;
-te_subjects = tr_info.te_subjects;
+% uncomment if UTKinect and if use LOOCV protocol
+n_tr_te_splits = 20;
+all_subjects = kron(1:10,ones(1,2));
+all_instances = kron(ones(1,10),[1 2]);
+te_subjects = zeros(20,1);
+tr_subjects = zeros(20,19);
+te_instances = zeros(20,1);
+tr_instances = zeros(20,19);
+for i = 1:20
+    te_subjects(i) = all_subjects(i);
+    tr_subjects(i,:) = all_subjects(setdiff(1:20,i));
+    te_instances(i) = all_instances(i);
+    tr_instances(i,:) = all_instances(setdiff(1:20,i));
+end
 
-action_sets = tr_info.action_sets;
-n_action_sets = length(action_sets);
+% n_tr_te_splits = size(tr_info.tr_subjects, 1);
+% tr_subjects = tr_info.tr_subjects;
+% te_subjects = tr_info.te_subjects;
 
 subject_labels = labels.subject_labels;
 action_labels = labels.action_labels;
+instance_labels = labels.instance_labels;
 
 results_dir = fullfile('..','expData','res');
 if ~exist(results_dir,'dir')
@@ -24,17 +37,12 @@ end
     % for set = 3
     % for set = 1:10 % uncomment if UCF
     
-%     actions = unique(action_sets{set}); % uncomment if MSR 3 sets
-%     n_classes = length(actions);        % uncomment if MSR 3 sets
-%     action_ind = ismember(action_labels, actions); % uncomment if MSR 3 sets
-    actions = unique(action_labels);%  % uncomment if use MSR all actions
-    n_classes = length(unique(actions));% % uncomment if use MSR all actions
-    
     %     rng(set); % uncomment if UCF
     %     n_tr_te_splits = 4; % uncomment if UCF
     %     indices = crossvalind('Kfold',length(action_labels), n_tr_te_splits); % uncomment if UCF
     
-
+        unique_classes = unique(action_labels);%  comment if MSR
+        n_classes = length(unique_classes);% comment if MSR
     
     % clustering
     %     clustering(HH(action_ind),n_classes,opt);
@@ -42,44 +50,43 @@ end
     total_accuracy = zeros(n_tr_te_splits, 1);
     cw_accuracy = zeros(n_tr_te_splits, n_classes);
     confusion_matrices = cell(n_tr_te_splits, 1);
-    trainTime = zeros(n_tr_te_splits, 1);
-    testTime = zeros(n_tr_te_splits, 1);
     
     for si = 1:n_tr_te_splits
         fprintf('Processing %d/%d ...\n',si,n_tr_te_splits);
         
         tr_subject_ind = ismember(subject_labels, tr_subjects(si,:));
         te_subject_ind = ismember(subject_labels, te_subjects(si,:));
-        %         tr_ind = ~te_ind;
-%         tr_ind = (action_ind & tr_subject_ind); % comment if not MSR
-%         te_ind = (action_ind & te_subject_ind); % comment if not MSR
-        tr_ind = tr_subject_ind; % uncomment if use MSR all actions
-        te_ind = te_subject_ind; % uncomment if use MSR all actions
-        %         tr_ind = find(indices~=si); % comment if not UCF
-        %         te_ind = find(indices==si); % comment if not UCF
+        tr_instance_ind = ismember(instance_labels, tr_instances(si,:)); % comment if not UTkinect
+        te_instance_ind = ismember(instance_labels, te_instances(si,:)); % comment if not UTkinect
+        tr_ind = (tr_instance_ind & tr_subject_ind); % comment if not UTkinect
+        te_ind = (te_instance_ind & te_subject_ind); % comment if not UTkinect
+%         tr_ind = tr_subject_ind; % comment if MSR or UTkinect
+%         te_ind = te_subject_ind; % comment if MSR or UTkinect
         
         % [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] =...
         %     vladClassify(data, tr_ind, te_ind, opt);
         
-        %         X_train = HH(tr_ind);
+%         X_train = HH(tr_ind);
         X_train = feat(:,tr_ind);
+        nTrain = length(X_train);
         y_train = action_labels(tr_ind);
-        %         X_test = HH(te_ind);
+%         X_test = HH(te_ind);
         X_test = feat(:,te_ind);
+        nTest = length(X_test);
         y_test = action_labels(te_ind);
         
         % train NN
         [predicted_labels,~,time] = nn(X_train, y_train, X_test, opt);
-        
-        %         C_val = 1;
-        %         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] = svm_one_vs_all(X_train, X_test,y_train, y_test, C_val);
+
+%         C_val = 1;
+%         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] = svm_one_vs_all(X_train, X_test,y_train, y_test, C_val);
         
         %         % test KNN
         %         predicted_labels = knn(X_train, y_train, X_test, opt);
         
         total_accuracy(si) = nnz(y_test==predicted_labels)/ length(y_test);
-        unique_classes = unique(y_test);
-        n_classes = length(unique_classes);
+%         unique_classes = unique(y_test);
+%         n_classes = length(unique_classes);
         class_wise_accuracy = zeros(1, n_classes);
         confusion_matrix = zeros(n_classes, n_classes);
         for i = 1:n_classes
@@ -185,32 +192,14 @@ end
     total_testTime = sum(testTime);
     total_runtime = toc(opt.tStart);
     
-%     save ([results_dir, '/classification_results_as', num2str(set), '.mat'],...
-%         'total_accuracy', 'cw_accuracy', 'avg_total_accuracy',...
-%         'avg_cw_accuracy', 'confusion_matrices', 'avg_confusion_matrix',...
-%         'total_trainTime','total_testTime','total_preprocessingTime',...
-%         'total_runtime');
     save ([results_dir, '/classification_results.mat'],...
         'total_accuracy', 'cw_accuracy', 'avg_total_accuracy',...
         'avg_cw_accuracy', 'confusion_matrices', 'avg_confusion_matrix',...
         'total_trainTime','total_testTime','total_preprocessingTime',...
         'total_runtime');
     
+%     save ([results_dir, '/classification_results.mat'],...
+%         'total_accuracy', 'cw_accuracy', 'avg_total_accuracy',...
+%         'avg_cw_accuracy', 'confusion_matrices', 'avg_confusion_matrix');
+    
 % end % comment if MSR OR UCF
-
-% total_runtime3 = toc(opt.tStart);
-% total_accuracy3 = 0;
-% total_trainTime3 = 0;
-% total_testTime3 = 0;
-% for i = 1:3
-%     load(fullfile('..','expData','res',sprintf('classification_results_as%d.mat',i)));
-%     total_accuracy3 = total_accuracy3 + avg_total_accuracy;
-%     total_trainTime3 = total_trainTime3 + total_trainTime;
-%     total_testTime3 = total_testTime3 + total_testTime;
-% end
-% avg_total_accuracy3 = total_accuracy3 / 3;
-% save ([results_dir, '/classification_results', '.mat'],...
-%     'avg_total_accuracy3','total_trainTime3','total_testTime3',...
-%     'total_preprocessingTime','total_runtime3');
-
-end
