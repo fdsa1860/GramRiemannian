@@ -6,23 +6,23 @@ feat = HH;
 total_preprocessingTime = toc(opt.tStart);
 
 % uncomment if UTKinect and if use LOOCV protocol
-n_tr_te_splits = 20;
-all_subjects = kron(1:10,ones(1,2));
-all_instances = kron(ones(1,10),[1 2]);
-te_subjects = zeros(20,1);
-tr_subjects = zeros(20,19);
-te_instances = zeros(20,1);
-tr_instances = zeros(20,19);
-for i = 1:20
-    te_subjects(i) = all_subjects(i);
-    tr_subjects(i,:) = all_subjects(setdiff(1:20,i));
-    te_instances(i) = all_instances(i);
-    tr_instances(i,:) = all_instances(setdiff(1:20,i));
-end
+% n_tr_te_splits = 20;
+% all_subjects = kron(1:10,ones(1,2));
+% all_instances = kron(ones(1,10),[1 2]);
+% te_subjects = zeros(20,1);
+% tr_subjects = zeros(20,19);
+% te_instances = zeros(20,1);
+% tr_instances = zeros(20,19);
+% for i = 1:20
+%     te_subjects(i) = all_subjects(i);
+%     tr_subjects(i,:) = all_subjects(setdiff(1:20,i));
+%     te_instances(i) = all_instances(i);
+%     tr_instances(i,:) = all_instances(setdiff(1:20,i));
+% end
 
-% n_tr_te_splits = size(tr_info.tr_subjects, 1);
-% tr_subjects = tr_info.tr_subjects;
-% te_subjects = tr_info.te_subjects;
+n_tr_te_splits = size(tr_info.tr_subjects, 1);
+tr_subjects = tr_info.tr_subjects;
+te_subjects = tr_info.te_subjects;
 
 subject_labels = labels.subject_labels;
 action_labels = labels.action_labels;
@@ -56,12 +56,12 @@ end
         
         tr_subject_ind = ismember(subject_labels, tr_subjects(si,:));
         te_subject_ind = ismember(subject_labels, te_subjects(si,:));
-        tr_instance_ind = ismember(instance_labels, tr_instances(si,:)); % comment if not UTkinect
-        te_instance_ind = ismember(instance_labels, te_instances(si,:)); % comment if not UTkinect
-        tr_ind = (tr_instance_ind & tr_subject_ind); % comment if not UTkinect
-        te_ind = (te_instance_ind & te_subject_ind); % comment if not UTkinect
-%         tr_ind = tr_subject_ind; % comment if MSR or UTkinect
-%         te_ind = te_subject_ind; % comment if MSR or UTkinect
+%         tr_instance_ind = ismember(instance_labels, tr_instances(si,:)); % comment if not UTkinect
+%         te_instance_ind = ismember(instance_labels, te_instances(si,:)); % comment if not UTkinect
+%         tr_ind = (tr_instance_ind & tr_subject_ind); % comment if not UTkinect
+%         te_ind = (te_instance_ind & te_subject_ind); % comment if not UTkinect
+        tr_ind = tr_subject_ind; % comment if MSR or UTkinect
+        te_ind = te_subject_ind; % comment if MSR or UTkinect
         
         % [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] =...
         %     vladClassify(data, tr_ind, te_ind, opt);
@@ -70,19 +70,24 @@ end
         X_train = feat(:,tr_ind);
         nTrain = length(X_train);
         y_train = action_labels(tr_ind);
+        y_subject_train = subject_labels(tr_ind);
 %         X_test = HH(te_ind);
         X_test = feat(:,te_ind);
         nTest = length(X_test);
         y_test = action_labels(te_ind);
+        y_subject_test = subject_labels(te_ind);
         
         % train NN
-        [predicted_labels,~,time] = nn(X_train, y_train, X_test, opt);
+%         [predicted_labels,~,time] = nn(X_train, y_train, X_test, opt);
+
+        % train NN2
+        [predicted_labels,~,time] = nn2(X_train, y_train, y_subject_train, X_test, opt);
 
 %         C_val = 1;
 %         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] = svm_one_vs_all(X_train, X_test,y_train, y_test, C_val);
         
         %         % test KNN
-        %         predicted_labels = knn(X_train, y_train, X_test, opt);
+%                 predicted_labels = knn(X_train, y_train, X_test, opt);
         
         total_accuracy(si) = nnz(y_test==predicted_labels)/ length(y_test);
 %         unique_classes = unique(y_test);

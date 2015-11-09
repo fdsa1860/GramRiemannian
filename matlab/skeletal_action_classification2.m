@@ -82,6 +82,8 @@ end
 
 if strcmp(datasets{dataset_idx}, 'UTKinect')
     action_UTKinect(HH,tr_info,labels,opt);
+elseif strcmp(datasets{dataset_idx}, 'Florence3D')
+    action_UTKinect(HH,tr_info,labels,opt);
 elseif strcmp(datasets{dataset_idx}, 'MSRAction3D')
     action_MSR3D(HH,tr_info,labels,opt);
 elseif strcmp(datasets{dataset_idx}, 'HDM05')

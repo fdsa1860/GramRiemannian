@@ -9,6 +9,18 @@ n_tr_te_splits = size(tr_info.tr_subjects, 1);
 tr_subjects = tr_info.tr_subjects;
 te_subjects = tr_info.te_subjects;
 
+n_tr_te_splits = nchoosek(10,5);
+tr_subjects = nchoosek(1:10,5);
+te_subjects = flipud(tr_subjects);
+
+% n_tr_te_splits = 1;
+% tr_subjects = [1 2 3 4 5];
+% te_subjects = [6 7 8 9 10];
+% 
+% n_tr_te_splits = 1;
+% tr_subjects = [1 3 5 7 9];
+% te_subjects = [2 4 6 8 10];
+
 action_sets = tr_info.action_sets;
 n_action_sets = length(action_sets);
 
@@ -64,12 +76,17 @@ end
         %         X_train = HH(tr_ind);
         X_train = feat(:,tr_ind);
         y_train = action_labels(tr_ind);
+        y_subject_train = subject_labels(tr_ind);
         %         X_test = HH(te_ind);
         X_test = feat(:,te_ind);
         y_test = action_labels(te_ind);
         
         % train NN
-        [predicted_labels,~,time] = nn(X_train, y_train, X_test, opt);
+%         [predicted_labels,~,time] = nn(X_train, y_train, X_test, opt);
+        
+        
+        % train NN2
+        [predicted_labels,~,time] = nn2(X_train, y_train, y_subject_train, X_test, opt);
         
         %         C_val = 1;
         %         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] = svm_one_vs_all(X_train, X_test,y_train, y_test, C_val);

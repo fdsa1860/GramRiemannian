@@ -1,7 +1,7 @@
 function predicted_labels = knn(X_train, y_train, X_test, opt)
 
 K = 10;
-D2 = HHdist(X_train, X_test, opt.metric);
+D2 = HHdist(X_train, X_test, opt);
 [D1,ind] = sort(D2);
 topLabel = y_train(ind(1:K,:));
 %         predicted_labels = mode(topLabel)';

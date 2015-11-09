@@ -3,6 +3,7 @@
 *.avi
 *.mat
 *.csv
+*.png
 *Thumbs.db
 expData/
 skeleton_data/
