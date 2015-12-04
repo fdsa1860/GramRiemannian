@@ -2,8 +2,8 @@ function D = checkDistanceMat(X, y)
 
 % opt.metric = 'JLD';
 % opt.metric = 'JLD_denoise';
-% opt.metric = 'binlong';
-opt.metric = 'AIRM';
+opt.metric = 'binlong';
+% opt.metric = 'AIRM';
 opt.H_structure = 'HHt';
 opt.sigma = 0.01;
 

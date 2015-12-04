@@ -1,4 +1,4 @@
-function [predicted_labels,D2,time] = nn(X_train, y_train, X_test, opt)
+function [predicted_labels,D2,time,HH_center] = nn(X_train, y_train, X_test, opt)
 
 tStart = tic;
 

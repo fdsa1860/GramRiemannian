@@ -63,18 +63,25 @@ load ../expData/MHAD_data_whole;
 % opt.metric='JBLD';
 opt.metric='KLDM';
 opt.H_structure = 'HHt';
-opt.sigma = 0.001;
+opt.sigma = 0.0001;
 opt.H_rows = 5;
 tStart = tic;
 HH = getHH(data, opt);
 toc(tStart)
+
+% [feat,label] = chopFeature(data(6));
+% HHfeat = getHH(feat, opt);
 
 % get centers
 X_train = HH(1:384);
 y_train = label_act(1:384);
 X_test = HH(385:end);
 y_test = label_act(385:end);
-[predicted_labels,D2,time] = nn(X_train, y_train, X_test, opt);
+[predicted_labels,D2,time,HH_center] = nn(X_train, y_train, X_test, opt);
+
+% D2 = HHdist(HH_center,HHfeat,opt);
+% [~,ind] = min(D2);
+
 accuracy = nnz(y_test==predicted_labels)/ length(y_test);
 accuracy
 %%
