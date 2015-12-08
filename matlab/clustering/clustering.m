@@ -1,7 +1,8 @@
 function clustering(X, n_classes, gt, actions, opt)
 
 % gt = action_labels(action_ind)';
-[label,X_centers,sD] = ncutJLD(X,n_classes,opt);
+% [label,X_centers,sD] = ncutJLD(X,n_classes,opt);
+[label,X_centers,sD] = kmeansJLD(X,n_classes,opt);
 v = perms(actions);
 acc = zeros(1,size(v,1));
 for i = 1:length(acc)

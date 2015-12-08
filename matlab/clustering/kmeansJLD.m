@@ -21,11 +21,15 @@ while iter<iter_max && nnz(label-label_old)>labelChangeThreshold
     label_old = label;
     [~,label] = min(D);
     for j=1:k
-        if strcmp(opt.metric,'JLD')
-%             X_center{j} = karcher(X{label==j});
-%             X_center{j} = BhattacharyyaMean(X{label==j});
+        if strcmp(opt.metric,'JBLD')
+            %   X_center{j} = BhattacharyyaMean(X{label==j});
             X_center{j} = steinMean(cat(3,X{label==j}));
-%             X_center{j} = findCenter(X(label==j),opt);
+        elseif strcmp(opt.metric,'AIRM')
+            X_center{j} = karcher(X{label==j});
+        elseif strcmp(opt.metric,'LERM')
+            X_center{j} = logEucMean(X{label==j});
+        elseif strcmp(opt.metric,'KLDM')
+            X_center{j} = jefferyMean(X{label==j});
         elseif strcmp(opt.metric,'binlong')
             X_center{j} = findCenter(X(label==j));
         end
