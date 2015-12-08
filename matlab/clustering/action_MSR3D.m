@@ -49,7 +49,7 @@ for set = 1:n_action_sets
 
     
     % clustering
-    %     clustering(HH(action_ind),n_classes,opt);
+    clustering(HH(action_ind),n_classes,action_labels(action_ind)',actions,opt);
     
     total_accuracy = zeros(n_tr_te_splits, 1);
     cw_accuracy = zeros(n_tr_te_splits, n_classes);

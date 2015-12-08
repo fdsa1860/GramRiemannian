@@ -33,21 +33,28 @@ label = sortLabel_count(NcutDiscrete);
 cparams(1:k) = struct ('alpha',0,'theta',0);
 X_center = cell(1, k);
 for j=1:k
-    if strcmp(opt.metric,'JLD')
-        if nnz(label==j)>1
-%             X_center{j} = karcher(X{label==j});
-            X_center{j} = steinMean(cat(3,X{label==j}));
-        elseif nnz(label==j)==1
-            X_center{j} = X{label==j};
-        elseif nnz(label==j)==0
-            error('cluster is empty.\n');
-        end
-%         d = HHdist(X_center(j),X(label==j),'JLD');
-%         d(abs(d)<1e-6) = 1e-6;
-%         param = gamfit(d);
-%         cparams(j).alpha = min(100,param(1));
-%         if isinf(cparams(j).alpha), keyboard;end
-%         cparams(j).theta = max(0.01,param(2));
+    
+    if nnz(label==j)==1
+        X_center{j} = X{label==j};
+        continue;
+    elseif nnz(label==j)==0
+        error('cluster is empty.\n');
+    end
+    
+    if strcmp(opt.metric,'JBLD')
+        X_center{j} = steinMean(cat(3,X{label==j}));
+        %         d = HHdist(X_center(j),X(label==j),'JLD');
+        %         d(abs(d)<1e-6) = 1e-6;
+        %         param = gamfit(d);
+        %         cparams(j).alpha = min(100,param(1));
+        %         if isinf(cparams(j).alpha), keyboard;end
+        %         cparams(j).theta = max(0.01,param(2));
+    elseif strcmp(opt.metric,'AIRM')
+        X_center{j} = karcher(X{label==j});
+    elseif strcmp(opt.metric,'LERM')
+        X_center{j} = logEucMean(X{label==j});
+    elseif strcmp(opt.metric,'KLDM')
+        X_center{j} = jefferyMean(X{label==j});
     elseif strcmp(opt.metric,'binlong')
         X_center{j} = findCenter(X(label==j));
     end
@@ -61,7 +68,7 @@ n = length(X);
 D = zeros(n,n);
 for i=1:n
     for j=i+1:n
-%         D(i,j) = hankeletAngle(X{i},X{j},thr);
+        %         D(i,j) = hankeletAngle(X{i},X{j},thr);
         D(i,j) = 2 - norm(X{i}+X{j},'fro');
     end
 end
