@@ -1,11 +1,13 @@
-function D = checkDistanceMat(X, y)
+function D = checkDistanceMat(X, y, opt)
 
-% opt.metric = 'JLD';
-% opt.metric = 'JLD_denoise';
-opt.metric = 'binlong';
-% opt.metric = 'AIRM';
-opt.H_structure = 'HHt';
-opt.sigma = 0.01;
+if nargin<3
+    opt.metric = 'JBLD';
+    % opt.metric = 'JLD_denoise';
+    % opt.metric = 'binlong';
+    % opt.metric = 'AIRM';
+    opt.H_structure = 'HHt';
+    opt.sigma = 0.01;
+end
 
 unique_classes = unique(y);
 n_classes = length(unique_classes);
