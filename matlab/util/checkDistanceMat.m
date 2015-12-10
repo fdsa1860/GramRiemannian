@@ -21,5 +21,6 @@ for ai = 1:n_classes
 end
 D = HHdist(Z,[],opt);
 imagesc(D);
+colorbar;
 
 end
