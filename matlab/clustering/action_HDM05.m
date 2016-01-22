@@ -1,5 +1,7 @@
 function action_HDM05(HH, tr_info, labels, opt)
 
+total_preprocessingTime = toc(opt.tStart);
+
 n_tr_te_splits = size(tr_info.tr_subjects, 1);
 tr_subjects = tr_info.tr_subjects;
 te_subjects = tr_info.te_subjects;
@@ -21,6 +23,8 @@ n_classes = length(unique(actions));
 total_accuracy = zeros(n_tr_te_splits, 1);
 cw_accuracy = zeros(n_tr_te_splits, n_classes);
 confusion_matrices = cell(n_tr_te_splits, 1);
+trainTime = zeros(n_tr_te_splits, 1);
+testTime = zeros(n_tr_te_splits, 1);
 
 for si = 1:n_tr_te_splits
     fprintf('Processing %d/%d ...\n',si,n_tr_te_splits);
@@ -41,7 +45,7 @@ for si = 1:n_tr_te_splits
     y_test = action_labels(te_ind);
     
     % train NN
-    [predicted_labels,sD] = nn(X_train, y_train, X_test, opt);
+    [predicted_labels,~,time] = nn(X_train, y_train, X_test, opt);
     
     %         % test KNN
     %         predicted_labels = knn(X_train, y_train, X_test, opt);
@@ -65,6 +69,8 @@ for si = 1:n_tr_te_splits
     end
     cw_accuracy(si,:) = class_wise_accuracy;
     confusion_matrices{si} = confusion_matrix;
+    trainTime(si) = time.trainTime;
+    testTime(si) = time.testTime;
     
     %         % SVM
     %         D1 = HHdist(HH_center,X_train,opt.metric);
@@ -148,9 +154,14 @@ for j = 1:length(confusion_matrices)
     avg_confusion_matrix = avg_confusion_matrix + confusion_matrices{j};
 end
 avg_confusion_matrix = avg_confusion_matrix / length(confusion_matrices);
+total_trainTime = sum(trainTime);
+total_testTime = sum(testTime);
+total_runtime = toc(opt.tStart);
 
 save ([results_dir, '/classification_results', '.mat'],...
     'total_accuracy', 'cw_accuracy', 'avg_total_accuracy',...
-    'avg_cw_accuracy', 'confusion_matrices', 'avg_confusion_matrix');
+    'avg_cw_accuracy', 'confusion_matrices', 'avg_confusion_matrix',...
+    'total_trainTime','total_testTime','total_preprocessingTime',...
+    'total_runtime');
 
 end

@@ -6,6 +6,7 @@ num_sys = 6; % number of systems
 sys_ord = [2 2 3 3 4 4]; % order for each system, minimum 2
 num_frame = 100; % time length for each sample
 num_sample = 500; % number of samples per system
+% num_sample = 50; % number of samples per system
 num_fold = 5; % cross validation
 num_MAXrandpro = 1000;
 num_Hcol = 10;%floor((num_frame + 1)/2);
@@ -59,7 +60,7 @@ randpro = temp_randpro./repmat(sum(temp_randpro.^2,2),1,num_Hcol);
 temp_randpro = randn(num_MAXrandpro,num_Hcol*2);
 randpro_2 = temp_randpro./repmat(sum(temp_randpro.^2,2),1,num_Hcol*2);
 %% Generate random index
-temp_index = randperm(500)';
+temp_index = randperm(num_sample)';
 for i = 1:num_fold
     index_train(:,i) = temp_index(unit_train*(i-1)+1:unit_train*i);
     index_test(:,i) = [temp_index(1:unit_train*(i-1));temp_index(unit_train*i+1:end)];

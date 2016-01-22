@@ -103,10 +103,10 @@ elseif (strcmp(dataset, 'MSRAction3D'))
     
 elseif (strcmp(dataset, 'HDM05'))
     [features, action_labels, subject_labels,instance_labels] = parseHDM05;
-%     tr_subjects = nchoosek(1:5,3);
-%     te_subjects = flipud(nchoosek(1:5,2));
-    tr_subjects = [1 4 5];
-    te_subjects = [2 3];
+    tr_subjects = nchoosek(1:5,4);
+    te_subjects = flipud(nchoosek(1:5,1));
+%     tr_subjects = [1 4 5];
+%     te_subjects = [2 3];
     save([directory, '/tr_te_splits'], 'tr_subjects', 'te_subjects');
     save([directory, '/features'], 'features', '-v7.3');
     save([directory, '/labels'], 'action_labels', 'subject_labels', 'instance_labels');

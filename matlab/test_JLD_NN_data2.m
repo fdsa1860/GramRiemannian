@@ -8,9 +8,8 @@ addpath(genpath('../3rdParty'));
 rng('default');
 data_generation;
 data_clean = data;
-n = 500;
 d = num_frame;
-N = n * num_sys;
+N = num_sample * num_sys;
 nc = 30;
 % opt.metric = 'binlong';
 % opt.metric = 'AIRM';
@@ -19,7 +18,7 @@ opt.metric = 'JBLD';
 % opt.metric = 'KLDM';
 opt.sigma = 1e-2;
 
-e = 0:0.2:5;
+e = 1:0.2:5;
 % e = 2;
 % p = zeros(1,length(e));
 % opt.sigma = 10.^(-6:-1);
@@ -65,10 +64,10 @@ for k = 1:length(e);
         y_train = [];
         y_test = [];
         for i = 1:num_sys
-            trainData = [trainData data(index_train(:,fold)+(i-1)*n,:)'];
-            y_train = [y_train label(index_train(:,fold)+(i-1)*n)'];
-            testData = [testData data(index_test(:,fold)+(i-1)*n,:)'];
-            y_test = [y_test label(index_test(:,fold)+(i-1)*n)'];
+            trainData = [trainData data(index_train(:,fold)+(i-1)*num_sample,:)'];
+            y_train = [y_train label(index_train(:,fold)+(i-1)*num_sample)'];
+            testData = [testData data(index_test(:,fold)+(i-1)*num_sample,:)'];
+            y_test = [y_test label(index_test(:,fold)+(i-1)*num_sample)'];
         end
         
         
@@ -114,10 +113,10 @@ for k = 1:length(e);
         % [predicted_label,HH_centers,sD] = kmeansJLD(HH,6,opt);
         % toc
         
-        % % ncut
-        % tic;
-        % [predicted_label,HH_centers,sD] = ncutJLD(HH,6,opt);
-        % toc
+%         % ncut
+%         tic;
+%         [predicted_label,HH_centers,sD] = ncutJLD(HH,6,opt);
+%         toc
         
         %% testing
         HH_test = cell(1,size(testData,2));
