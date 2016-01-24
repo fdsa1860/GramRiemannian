@@ -23,6 +23,9 @@ if ~isSymmetric
                 D(i,j) = LERM(HH1{i},HH2{j});
             elseif strcmp(opt.metric,'KLDM')
                 D(i,j) = KLDM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'SubspaceAngle')
+%                 D(i,j) = mySubspaceAngle(HH1{i},HH2{j},opt.SA_thr);
+                D(i,j) = subspace(HH1{i},HH2{j});
             end
         end
     end
@@ -43,6 +46,9 @@ else
                 D(i,j) = LERM(HH1{i},HH2{j});
             elseif strcmp(opt.metric,'KLDM')
                 D(i,j) = KLDM(HH1{i},HH2{j});
+            elseif strcmp(opt.metric,'SubspaceAngle')
+%                 D(i,j) = mySubspaceAngle(HH1{i},HH2{j},opt.SA_thr);
+                D(i,j) = subspace(HH1{i},HH2{j});
             end
         end
     end

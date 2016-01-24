@@ -5,7 +5,7 @@ tStart = tic;
 unique_classes = unique(y_train);
 n_classes = length(unique_classes);
 
-if strcmp(opt.metric,'binlong')
+if strcmp(opt.metric,'binlong') || strcmp(opt.metric,'SubspaceAngle')
     D = HHdist(X_train,X_train,opt); % uncomment if opt.metric=='binlong'
     centerInd = findCenters(D,y_train); % uncomment if opt.metric=='binlong'
     HH_center = X_train(centerInd); % uncomment if opt.metric=='binlong'

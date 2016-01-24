@@ -63,13 +63,16 @@ data = load(loadname, 'features');
 % opt.metric = 'JBLD_denoise';
 % opt.metric = 'binlong';
 % opt.metric = 'AIRM';
-opt.metric = 'LERM';
+% opt.metric = 'LERM';
 % opt.metric = 'KLDM';
+opt.metric = 'SubspaceAngle';
+
 opt.H_structure = 'HHt';
-opt.H_rows = 5;
+opt.H_rows = 12;
 opt.sigma = 0.01;
 % opt.sigma = 0.25; % MSR parameter
 opt.epsilon = 0.01;
+opt.SA_thr = 0.5;
 
 HH = getHH(data.features,opt);
 % HH = getCov(data.features);

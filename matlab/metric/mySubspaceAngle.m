@@ -1,12 +1,12 @@
-function y = mySubspaceAngle(seg1,seg2,thr)
+function y = mySubspaceAngle(H1,H2,thr)
 
 % addpath('../3rdParty/hstln');
 
-D = size(seg1,2);
-assert(size(seg2,2)==D);
+% D = size(seg1,2);
+% assert(size(seg2,2)==D);
 
 % nr = 8;
-nc = 4;
+% nc = 4;
 
 % v1 = diff(seg1);
 % v2 = diff(seg2);
@@ -25,7 +25,7 @@ nc = 4;
 % H1 = hankel_mo(v1',[nr size(v1,1)-nr/2+1]);
 % seg1 = seg1 - repmat(mean(seg1),size(seg1,1),1);
 % H1 = hankel_mo(seg1',[nr size(seg1,1)-nr/2+1]);
-H1 = hankel_mo(seg1',[(size(seg1,1)-nc+1)*D, nc]);
+% H1 = hankel_mo(seg1',[(size(seg1,1)-nc+1)*D, nc]);
 
 % dc1 = kron(ones(nr/2,1),[1;0]);
 % dc2 = kron(ones(nr/2,1),[0;1]);
@@ -46,7 +46,7 @@ ind1 = [true;ind1(1:end-1)];
 % H2 = hankel_mo(v2',[nr size(v2,1)-nr/2+1]);
 % seg2 = seg2 -  repmat(mean(seg2),size(seg2,1),1);
 % H2 = hankel_mo(seg2',[nr size(seg2,1)-nr/2+1]);
-H2 = hankel_mo(seg2',[(size(seg2,1)-nc+1)*D, nc]);
+% H2 = hankel_mo(seg2',[(size(seg2,1)-nc+1)*D, nc]);
 
 % for i = 1:size(H2,2)
 %     temp = H2(:,i);
@@ -61,11 +61,12 @@ s2 = diag(S2);
 ind2 = cumsum(s2)/sum(s2) < thr;
 ind2 = [true;ind2(1:end-1)];
 
-if nnz(ind1)==nnz(ind2)
-    y = subspace(V1(:,ind1),V2(:,ind2));
-else
-    y = pi/2;
-end
+% if nnz(ind1)==nnz(ind2)
+%     y = subspace(V1(:,ind1),V2(:,ind2));
+    y = subspace(U1(:,ind1), U2(:,ind2));
+% else
+%     y = pi/2;
+% end
 
 % ind = ind1 | ind2;
 % y = subspace(U1(:,ind),U2(:,ind));

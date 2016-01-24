@@ -10,16 +10,20 @@ data_generation;
 data_clean = data;
 d = num_frame;
 N = num_sample * num_sys;
-nc = 30;
+nc = 5;
+
 % opt.metric = 'binlong';
 % opt.metric = 'AIRM';
 % opt.metric = 'LERM';
-opt.metric = 'JBLD';
+% opt.metric = 'JBLD';
 % opt.metric = 'KLDM';
+opt.metric ='SubspaceAngle';
+opt.SA_thr = 0.99;
+
 opt.sigma = 1e-2;
 
-e = 1:0.2:5;
-% e = 2;
+% e = 1:0.2:5;
+e = 0.01;
 % p = zeros(1,length(e));
 % opt.sigma = 10.^(-6:-1);
 % p = zeros(1,length(opt.sigma));
@@ -81,13 +85,13 @@ for k = 1:length(e);
             if strcmp(opt.metric,'AIRM') || strcmp(opt.metric,'LERM')...
                     || strcmp(opt.metric,'KLDM') || strcmp(opt.metric,'JBLD')
                 HH{i} = HH1 + opt.sigma(1) * eye(nc);
-            elseif strcmp(opt.metric,'binlong')
+            elseif strcmp(opt.metric,'binlong') || strcmp(opt.metric,'SubspaceAngle')
                 HH{i} = HH1;
             end
         end
         
         % NN
-        if strcmp(opt.metric,'binlong')
+        if strcmp(opt.metric,'binlong') || strcmp(opt.metric,'SubspaceAngle')
             D = HHdist(HH, [], opt);
             centerInd = findCenters(D, y_train);
             HH_centers = HH(centerInd);
@@ -127,7 +131,7 @@ for k = 1:length(e);
             if strcmp(opt.metric,'AIRM') || strcmp(opt.metric,'LERM')...
                     || strcmp(opt.metric,'KLDM') || strcmp(opt.metric,'JBLD')
                 HH_test{i} = HH1 + opt.sigma(1) * eye(nc);
-            elseif strcmp(opt.metric,'binlong')
+            elseif strcmp(opt.metric,'binlong') || strcmp(opt.metric,'SubspaceAngle')
                 HH_test{i} = HH1;
             end
         end

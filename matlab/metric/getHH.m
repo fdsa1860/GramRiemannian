@@ -35,6 +35,12 @@ for i=1:length(features)
         HH{i} = HHt + I;
     elseif strcmp(opt.metric,'binlong')
         HH{i} = HHt;
+    elseif strcmp(opt.metric,'SubspaceAngle')
+        [U1,S1,V1] = svd(HHt);
+        s1 = diag(S1);
+        ind1 = cumsum(s1)/sum(s1) < opt.SA_thr;
+        ind1 = [true;ind1(1:end-1)];
+        HH{i} = U1(:,ind1);
     end
 end
 
