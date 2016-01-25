@@ -81,15 +81,18 @@ for set = 1:n_action_sets
         X_test = feat(:,te_ind);
         y_test = action_labels(te_ind);
         
-        % train NN
-        [predicted_labels,~,time] = nn(X_train, y_train, X_test, opt);
+%         % train NN
+%         [predicted_labels,~,time] = nn(X_train, y_train, X_test, opt);
         
         
         % train NN2
 %         [predicted_labels,~,time] = nn2(X_train, y_train, y_subject_train, X_test, opt);
+
+%         C_val = 1;
+%         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] = svm_one_vs_all(X_train, X_test,y_train, y_test, C_val);
         
-        %         C_val = 1;
-        %         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] = svm_one_vs_all(X_train, X_test,y_train, y_test, C_val);
+        C_val = 10;
+        [predicted_labels,time] = svm_one_vs_all_kernel(X_train, X_test,y_train, y_test, C_val, opt);
         
         %         % test KNN
         %         predicted_labels = knn(X_train, y_train, X_test, opt);

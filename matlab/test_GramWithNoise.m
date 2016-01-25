@@ -25,9 +25,9 @@ s = 0;
 % metricSet = {'AIRM', 'JBLD', 'LERM', 'KLDM'};
 metricSet = {'AIRM'};
 % s = 10.^(-7:-2);
-% s = 0.01:0.01:0.1;
+s = 0.01:0.01:0.1;
 % e = 10.^(-7:0.2:-2);
-e = 0.01:0.01:0.1;
+% e = 0.01:0.01:0.1;
 % e = 0.1;
 d1 = zeros(length(s), length(e));
 d2 = zeros(length(s), length(e));
@@ -66,27 +66,33 @@ for si = 1:length(s)
     end
 end
 
-% figure; hold on;
-% plot(s,d1(:,1,1),'b*');
-% plot(s,d2(:,1,1),'r*');
-% xlabel('Regularization value \sigma');
-% ylabel('AIRM distance between two instances');
-% title('AIRM distance VS regularization value (with clean data)');
-% legend('intra-class AIRM distance', 'inter-class AIRM distance');
-
 figure; hold on;
-plot(e,d1(1,:,1),'b*');
+set(gca,'FontSize',12)
+plot(s,d1(:,1,1)','b*','MarkerSize',10);
+plot(s,d2(:,1,1)','r*','MarkerSize',10);
+xlabel('Regularization value \sigma','FontSize',15);
+ylabel('AIRM distance between two instances','FontSize',15);
+title('AIRM distance VS regularization value (with clean data)','FontSize',15);
+hLegend = legend('intra-class AIRM distance','inter-class AIRM distance');
+set(hLegend,'FontSize',15)
+
+
+% figure; hold on;
+% set(gca,'FontSize',12)
+% plot(e,d1(1,:,1),'b*','MarkerSize',10);
 % plot(e,d1(1,:,2),'b^');
 % plot(e,d1(1,:,3),'bx');
 % plot(e,d1(1,:,4),'bo');
-plot(e,d2(1,:,1),'r*');
+% plot(e,d2(1,:,1),'r*','MarkerSize',10);
 % plot(e,d2(1,:,2),'r^');
 % plot(e,d2(1,:,3),'rx');
 % plot(e,d2(1,:,4),'ro');
-xlabel('Noise standard deviation \epsilon');
-ylabel('AIRM distance between two instances');
-title('AIRM distance VS noise level (with regularization \sigma=0)');
-legend('intra-class AIRM distance','inter-class AIRM distance');
+% xlabel('Noise standard deviation \epsilon','FontSize',15);
+% ylabel('AIRM distance between two instances','FontSize',15);
+% title('AIRM distance VS noise level (with regularization \sigma=0)','FontSize',15);
+% hLegend = legend('intra-class AIRM distance','inter-class AIRM distance');
+% set(hLegend,'FontSize',15)
+
 % legend('intra-class AIRM distance','intra-class JBLD distance', ...
 %     'intra-class LERM distance', ...
 %     'inter-class AIRM distance', 'inter-class JBLD distance', ...
