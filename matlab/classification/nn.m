@@ -5,7 +5,18 @@ tStart = tic;
 unique_classes = unique(y_train);
 n_classes = length(unique_classes);
 
-if strcmp(opt.metric,'binlong') || strcmp(opt.metric,'SubspaceAngle')
+if strcmp(opt.metric,'SubspaceAngleFast')
+    for i = 1:length(X_train) 
+        [U1,S1,V1] = svd(X_train{i});
+        s1 = diag(S1);
+        ind1 = cumsum(s1)/sum(s1) < opt.SA_thr;
+        ind1 = [true;ind1(1:end-1)];
+        X_train{i} = U1(:,ind1);
+    end
+end
+
+if strcmp(opt.metric,'binlong') || strcmp(opt.metric,'SubspaceAngle') ||...
+        strcmp(opt.metric,'SubspaceAngleFast')
     D = HHdist(X_train,X_train,opt); % uncomment if opt.metric=='binlong'
     centerInd = findCenters(D,y_train); % uncomment if opt.metric=='binlong'
     HH_center = X_train(centerInd); % uncomment if opt.metric=='binlong'
@@ -50,6 +61,16 @@ time.trainTime = toc(tStart);
 
 % test NN
 tStart = tic;
+
+if strcmp(opt.metric,'SubspaceAngleFast')
+    for i = 1:length(X_test) 
+        [U1,S1,V1] = svd(X_test{i});
+        s1 = diag(S1);
+        ind1 = cumsum(s1)/sum(s1) < opt.SA_thr;
+        ind1 = [true;ind1(1:end-1)];
+        X_test{i} = U1(:,ind1);
+    end
+end
 
 D2 = HHdist(HH_center,X_test,opt);
 [~,ind] = min(D2);

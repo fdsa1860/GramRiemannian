@@ -59,16 +59,17 @@ end
 loadname = [directory, '/features'];
 data = load(loadname, 'features');
 
-opt.metric = 'JBLD';
+% opt.metric = 'JBLD';
 % opt.metric = 'JBLD_denoise';
 % opt.metric = 'binlong';
 % opt.metric = 'AIRM';
 % opt.metric = 'LERM';
 % opt.metric = 'KLDM';
 % opt.metric = 'SubspaceAngle';
+opt.metric = 'SubspaceAngleFast';
 
 opt.H_structure = 'HHt';
-opt.H_rows = 12;
+opt.H_rows = 1;
 opt.sigma = 0.01;
 % opt.sigma = 0.25; % MSR parameter
 opt.epsilon = 0.01;
