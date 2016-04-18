@@ -44,10 +44,12 @@ end
 
 %% display
 figure;
+set(gcf,'color','white')
 subplot(411);plot(D(1,:));ylabel('bearing 1');ylim([0 0.3]);
 subplot(412);plot(D(2,:));ylabel('bearing 2');ylim([0 0.3]);
 subplot(413);plot(D(3,:));ylabel('bearing 3');ylim([0 0.3]);
 subplot(414);plot(D(4,:));ylabel('bearing 4');ylim([0 0.3]);
+export_fig ../bearingData2.pdf -native
 
 % figure;
 % subplot(811);plot(D(1,:));ylabel('bearing 1');ylim([0 1]);

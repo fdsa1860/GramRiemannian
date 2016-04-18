@@ -32,7 +32,7 @@ for t=1:T
     drawnow;
 %     pause(0.1);
     t
-    pause;
+%     pause;
     35;
 end
 

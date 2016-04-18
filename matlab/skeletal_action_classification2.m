@@ -6,13 +6,13 @@ addpath(genpath('../3rdParty'))
 addpath(genpath('.'))
 addpath(genpath('../skeleton_data'))
 
-feature_types = {'JLD'};
+feature_types = {'normal','original'};
 
 if nargin < 2
     feature_idx = 1;
 end
 
-if (feature_idx > 1)
+if (feature_idx > 2)
     error('Feature index should be less than 6');
 end
 
@@ -33,13 +33,6 @@ end
 directory = [datasets{dataset_idx}, '_experiments/', feature_types{feature_idx}];
 mkdir(directory)
 
-% Training and test subjects
-if dataset_idx<5
-    tr_info = load(['../skeleton_data/', datasets{dataset_idx}, '/tr_te_splits']);
-elseif dataset_idx == 5
-    tr_info = load([directory, '/tr_te_splits']);
-end
-
 opt.tStart = tic;
 
 %% Skeletal representation
@@ -48,8 +41,14 @@ disp ('Generating skeletal representation')
     generate_features(directory, datasets{dataset_idx}, feature_types{feature_idx});
 % end
 
+% Training and test subjects
+if dataset_idx<5
+    tr_info = load(['../skeleton_data/', datasets{dataset_idx}, '/tr_te_splits']);
+elseif dataset_idx == 5
+    tr_info = load([directory, '/tr_te_splits']);
+end
+
 %% JLD
-disp ('JLD dictionary')
 if dataset_idx==1 || dataset_idx==4
     labels = load([directory, '/labels'], 'action_labels', 'subject_labels','instance_labels');
 else
@@ -64,12 +63,12 @@ data = load(loadname, 'features');
 % opt.metric = 'binlong';
 % opt.metric = 'AIRM';
 % opt.metric = 'LERM';
-% opt.metric = 'KLDM';
+opt.metric = 'KLDM';
 % opt.metric = 'SubspaceAngle';
-opt.metric = 'SubspaceAngleFast';
+% opt.metric = 'SubspaceAngleFast';
 
 opt.H_structure = 'HHt';
-opt.H_rows = 1;
+opt.H_rows = 9;
 opt.sigma = 0.01;
 % opt.sigma = 0.25; % MSR parameter
 opt.epsilon = 0.01;
