@@ -1,5 +1,7 @@
 function [predicted_labels,D2,time,HH_center] = nn(X_train, y_train, X_test, opt)
 
+% Nearest Neighbor classification
+
 tStart = tic;
 
 unique_classes = unique(y_train);
@@ -17,9 +19,9 @@ end
 
 if strcmp(opt.metric,'binlong') || strcmp(opt.metric,'SubspaceAngle') ||...
         strcmp(opt.metric,'SubspaceAngleFast')
-    D = HHdist(X_train,X_train,opt); % uncomment if opt.metric=='binlong'
-    centerInd = findCenters(D,y_train); % uncomment if opt.metric=='binlong'
-    HH_center = X_train(centerInd); % uncomment if opt.metric=='binlong'
+    D = HHdist(X_train, X_train, opt);
+    centerInd = findCenters(D, y_train);
+    HH_center = X_train(centerInd);
 elseif strcmp(opt.metric,'JBLD') || strcmp(opt.metric,'JLD_denoise')
     HH_center = cell(1, n_classes);
     %         cparams(1:n_classes) = struct ('prior',0,'alpha',0,'theta',0);

@@ -7,56 +7,35 @@ addpath(genpath('.'))
 addpath(genpath('../skeleton_data'))
 
 feature_types = {'normal','original'};
+datasets = {'UTKinect', 'MHAD', 'MSRAction3D', 'HDM05'};
 
 if nargin < 2
     feature_idx = 1;
 end
 
-if (feature_idx > 2)
-    error('Feature index should be less than 6');
+if (feature_idx > length(feature_types))
+    error('Feature index should be less or equal than %d\n',length(feature_types));
 end
 
-datasets = {'UTKinect', 'Florence3D', 'MSRAction3D', 'UCF', 'HDM05'};
-
-if (dataset_idx > 5)
-    error('Dataset index should be less than 5');
+if (dataset_idx > length(datasets))
+    error('Dataset index should be less than %d\n',length(datasets));
 end
 
-if ~strcmp(datasets{dataset_idx}, 'UTKinect') && ...
-        ~strcmp(datasets{dataset_idx}, 'Florence3D') && ...
-        ~strcmp(datasets{dataset_idx}, 'MSRAction3D') && ...
-        ~strcmp(datasets{dataset_idx}, 'UCF') && ...
-        ~strcmp(datasets{dataset_idx}, 'HDM05')
-    error('Unknown dataset')
-end
-
-directory = [datasets{dataset_idx}, '_experiments/', feature_types{feature_idx}];
+directory = fullfile('..','expData',datasets{dataset_idx}, feature_types{feature_idx});
 mkdir(directory)
 
 opt.tStart = tic;
-
-%% Skeletal representation
-disp ('Generating skeletal representation')
-% if (~exist([directory '/features.mat'],'file'))
-    generate_features(directory, datasets{dataset_idx}, feature_types{feature_idx});
-% end
+generate_features(directory, datasets{dataset_idx}, feature_types{feature_idx});
 
 % Training and test subjects
-if dataset_idx<5
+if strcmp(datasets{dataset_idx},'UTKinect') || strcmp(datasets{dataset_idx},'MSRAction3D') 
     tr_info = load(['../skeleton_data/', datasets{dataset_idx}, '/tr_te_splits']);
-elseif dataset_idx == 5
+elseif strcmp(datasets{dataset_idx},'HDM05') || strcmp(datasets{dataset_idx},'MHAD')
     tr_info = load([directory, '/tr_te_splits']);
 end
 
-%% JLD
-if dataset_idx==1 || dataset_idx==4
-    labels = load([directory, '/labels'], 'action_labels', 'subject_labels','instance_labels');
-else
-    labels = load([directory, '/labels'], 'action_labels', 'subject_labels');
-end
-
-loadname = [directory, '/features'];
-data = load(loadname, 'features');
+labels = load(fullfile(directory, 'labels'));
+data = load(fullfile(directory, 'features'));
 
 % opt.metric = 'JBLD';
 % opt.metric = 'JBLD_denoise';
@@ -68,13 +47,15 @@ opt.metric = 'KLDM';
 % opt.metric = 'SubspaceAngleFast';
 
 opt.H_structure = 'HHt';
-opt.H_rows = 9;
-opt.sigma = 0.01;
-% opt.sigma = 0.25; % MSR parameter
-opt.epsilon = 0.01;
-opt.SA_thr = 0.5;
+% opt.H_structure = 'HtH';
+opt.H_rows = 5;
+% opt.H_rows = 4; % UTKinect parameter, shortest video is 4 frames
+opt.sigma = 0.0001;
+% opt.epsilon = 0.01; % SubspaceAngle parameter
+% opt.SA_thr = 0.5;   % SubspaceAngle parameter
 
-HH = getHH(data.features,opt);
+featVel = getVelocity(data.features);
+HH = getHH(featVel, opt);
 % HH = getCov(data.features);
 % HH_main = getHH_local(data.features);
 
@@ -85,12 +66,14 @@ end
 
 if strcmp(datasets{dataset_idx}, 'UTKinect')
     action_UTKinect(HH,tr_info,labels,opt);
-elseif strcmp(datasets{dataset_idx}, 'Florence3D')
-    action_UTKinect(HH,tr_info,labels,opt);
+elseif strcmp(datasets{dataset_idx}, 'MHAD')
+    action_MHAD(HH,tr_info,labels,opt);
 elseif strcmp(datasets{dataset_idx}, 'MSRAction3D')
     action_MSR3D(HH,tr_info,labels,opt);
 elseif strcmp(datasets{dataset_idx}, 'HDM05')
     action_HDM05(HH,tr_info,labels,opt);
+else
+    error('unknown dataset.\n')
 end
 
 

@@ -5,8 +5,8 @@ clear
 num_sys = 6; % number of systems
 sys_ord = [2 2 3 3 4 4]; % order for each system, minimum 2
 num_frame = 100; % time length for each sample
-num_sample = 500; % number of samples per system
-% num_sample = 50; % number of samples per system
+% num_sample = 500; % number of samples per system
+num_sample = 50; % number of samples per system
 num_fold = 5; % cross validation
 num_MAXrandpro = 1000;
 num_Hcol = 10;%floor((num_frame + 1)/2);

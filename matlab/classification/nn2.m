@@ -1,5 +1,7 @@
 function [predicted_labels,D2,time] = nn2(X_train, y_train, y_subject_train, X_test, opt)
 
+% Nearest Neighbors with training subjects label
+
 tStart = tic;
 
 unique_classes = unique(y_train);

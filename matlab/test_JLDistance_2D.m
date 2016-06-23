@@ -9,7 +9,7 @@ R(:, :, 3) = [0.7 -0.2; 0.5 0.4];
 R(:, :, 4) = [0.7 0.2; 0.1 0.9];
 
 rng('default');
-n = 1000;
+n = 10;
 d = 20;
 N = n*size(R, 3);
 data = zeros(d, 2, N);
@@ -22,7 +22,7 @@ for i = 1:size(R,3)
         end
     end
 end
-data = data + 0.1*randn(d, 2, N);
+data = data + 0.0*randn(d, 2, N);
 
 tic
 D = zeros(N);

@@ -1,11 +1,8 @@
 function [features, action_labels, subject_labels,instance_labels] = parseHDM05
 
-% addpath(genpath('parser'))
-% addpath(genpath('animate'))
-% addpath('quaternions')
-addpath(genpath('../3rdParty/HDM05-Parser'))
+addpath(genpath(fullfile('..','3rdParty','HDM05-Parser')));
 
-dataPath = '~/research/data/HDM05_cut_amc';
+dataPath = fullfile('~','research','data','HDM05_cut_amc');
 % action = {'depositFloorR','elbowToKnee3RepsLelbowStart','grabHighR',...
 %     'hopBothLegs3hops','jogLeftCircle4StepsRstart','kickRFront1Reps',...
 %     'lieDownFloor','rotateArmsBothBackward3Reps','sneak4StepsRStart',...

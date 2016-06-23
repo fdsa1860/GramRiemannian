@@ -35,31 +35,6 @@ if (strcmp(dataset, 'UTKinect'))
                 end
             end
         end        
-    end       
- 
-elseif (strcmp(dataset, 'Florence3D'))    
-    
-    J = [1   2   2   2   4   5   7    8     3     3     10   11    13    14;
-         2   3   4   7   5   6   8    9    10     13    11   12    14    15];
-
-    for i = 1:length(skeletal_data) 
-        S = skeletal_data{i}.original_skeletal_data;
-        n_frames = size(S,3);                  
-        for n = 1:n_frames
-            plot3(S(1,:,n),S(2,:,n),S(3,:,n),'r.');             
-            axis([-2 2 -4 4 -2 2])    
-            grid on
-            xlabel('x-axis')
-            ylabel('y-axis')
-            zlabel('z-axis')
-            title([num2str(skeletal_data{i}.subject), ' ', num2str(skeletal_data{i}.action)])
-            for j = 1:size(J,2)
-                c1 = J(1,j);
-                c2 = J(2,j);
-                line([S(1, c1, n) S(1, c2, n)], [S(2, c1, n) S(2, c2, n)], [S(3, c1, n) S(3, c2, n)]);
-            end            
-            pause(1/10)
-        end
     end
     
 else

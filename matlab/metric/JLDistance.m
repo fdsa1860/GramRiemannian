@@ -13,10 +13,10 @@ end
 % seg1 = bsxfun(@minus, seg1, mean(seg1));
 % seg2 = bsxfun(@minus, seg2, mean(seg2));
 
-% H1 = hankel_mo(seg1',[nr size(seg1,1)-nr/D+1]);
-% H2 = hankel_mo(seg2',[nr size(seg2,1)-nr/D+1]);
-H1 = hankel_mo(seg1',[size(seg1,1)-nc+1, nc]);
-H2 = hankel_mo(seg2',[size(seg2,1)-nc+1, nc]);
+% H1 = blockHankel(seg1',[nr size(seg1,1)-nr/D+1]);
+% H2 = blockHankel(seg2',[nr size(seg2,1)-nr/D+1]);
+H1 = blockHankel(seg1',[size(seg1,1)-nc+1, nc]);
+H2 = blockHankel(seg2',[size(seg2,1)-nc+1, nc]);
 
 H1_p = H1 / (norm(H1*H1','fro')^0.5);
 H2_p = H2 / (norm(H2*H2','fro')^0.5);

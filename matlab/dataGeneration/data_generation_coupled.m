@@ -25,12 +25,13 @@ theta = rand(2, num_sys);
 for i = 1:num_sys
     U = orth(rand(sys_ord*dim));
     Lambda = [
-        cos(theta(1,i)) sin(theta(1,i)) 0 0
-        -sin(theta(1,i)) cos(theta(1,i)) 0 0
+        cos(theta(1,1)) sin(theta(1,1)) 0 0
+        -sin(theta(1,1)) cos(theta(1,1)) 0 0
         0 0 cos(theta(2,i)) sin(theta(2,i))
         0 0 -sin(theta(2,i)) cos(theta(2,i))
         ];
-    A{i} = U * Lambda * U';
+%     A{i} = U * Lambda * U';
+    A{i} = U;
 end
 
 C = [
