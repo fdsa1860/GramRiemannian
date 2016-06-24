@@ -1,7 +1,7 @@
 function action_MHAD(data, tr_info, labels, opt)
 
-featVel = getVelocity(data.features);
-HH = getHH(featVel, opt);
+jointsVel = getVelocity(data.joints);
+HH = getHH(jointsVel, opt);
 feat = HH;
 % feat = getLogHH(HH);
 

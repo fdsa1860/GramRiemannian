@@ -49,7 +49,7 @@ for i = 1:length(action)
                 mot.jointTrajectories{m} = T(3*m-2:3*m,:);
             end
 %             T(1:3,:) = [];
-            T = T([16 17 18 31 32 33 67 68 69 88 89 90],:);
+            T = T([16 17 18 31 32 33 67 68 69 88 89 90],:);% hands and feet
             features{count} = T;
             instance_labels(count) = k;
             count = count + 1;

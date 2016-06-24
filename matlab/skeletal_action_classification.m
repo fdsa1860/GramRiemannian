@@ -1,33 +1,39 @@
-function [] = skeletal_action_classification2(dataset_idx, feature_idx)
+function [] = skeletal_action_classification(dataset_idx)
 
-dbstop if error
+% skeletal_action_classification(dataset_idx)
+% dataset_idx is set:
+% 1 if UTKinect
+% 2 if MHAD
+% 3 if MSRAction3D
+% 4 if HDM05
 
-addpath(genpath('../3rdParty'))
+% dbstop if error
+
+if nargin < 1
+    msg = ['You need to input the dataset index. You may run function '...
+        'help to see a list of the available datasets'];
+    error(msg);
+end
+
 addpath(genpath('.'))
+addpath(genpath('../3rdParty'))
 addpath(genpath('../skeleton_data'))
 
-feature_types = {'normal','original'};
 datasets = {'UTKinect', 'MHAD', 'MSRAction3D', 'HDM05'};
-
-if nargin < 2
-    feature_idx = 1;
-end
-
-if (feature_idx > length(feature_types))
-    error('Feature index should be less or equal than %d\n',length(feature_types));
-end
 
 if (dataset_idx > length(datasets))
     error('Dataset index should be less than %d\n',length(datasets));
 end
 
-directory = fullfile('..','expData',datasets{dataset_idx}, feature_types{feature_idx});
-mkdir(directory)
+directory = fullfile('..','expData',datasets{dataset_idx});
+if ~exist(directory,'dir')
+    mkdir(directory);
+end
 
 opt.tStart = tic;
-generate_features(directory, datasets{dataset_idx}, feature_types{feature_idx});
+generate_features(directory, datasets{dataset_idx});
 
-% Training and test subjects
+% Training and testing subjects
 if strcmp(datasets{dataset_idx},'UTKinect') || strcmp(datasets{dataset_idx},'MSRAction3D') 
     tr_info = load(['../skeleton_data/', datasets{dataset_idx}, '/tr_te_splits']);
 elseif strcmp(datasets{dataset_idx},'HDM05') || strcmp(datasets{dataset_idx},'MHAD')
@@ -35,7 +41,7 @@ elseif strcmp(datasets{dataset_idx},'HDM05') || strcmp(datasets{dataset_idx},'MH
 end
 
 labels = load(fullfile(directory, 'labels'));
-data = load(fullfile(directory, 'features'));
+data = load(fullfile(directory, 'joints'));
 
 % opt.metric = 'JBLD';
 % opt.metric = 'JBLD_denoise';

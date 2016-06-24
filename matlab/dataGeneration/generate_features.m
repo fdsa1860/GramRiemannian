@@ -1,4 +1,4 @@
-function [] = generate_features(directory, dataset, feature_type)
+function [] = generate_features(directory, dataset)
 
 if (strcmp(dataset, 'UTKinect')) || (strcmp(dataset, 'Florence3D')) ||...
         (strcmp(dataset, 'MSRAction3D'))
@@ -13,7 +13,7 @@ if (strcmp(dataset, 'UTKinect'))
     
     n_sequences = length(find(skeletal_data_validity));
     
-    features = cell(n_sequences, 1);
+    joints = cell(n_sequences, 1);
     action_labels = zeros(n_sequences, 1);
     subject_labels = zeros(n_sequences, 1);
     instance_labels = zeros(n_sequences, 1);
@@ -25,8 +25,9 @@ if (strcmp(dataset, 'UTKinect'))
                 if (skeletal_data_validity(action, subject, instance))
                     
                     joint_locations = skeletal_data{action, subject, instance}.joint_locations;
-%                     if size(joint_locations,3) < 20, continue; end
-                    features{count} = get_features(feature_type, joint_locations, body_model);
+                    joint_locations(:, body_model.hip_center_index, :) = [];
+                    S = size(joint_locations);
+                    joints{count} = reshape(joint_locations, S(1)*S(2), S(3));
                     action_labels(count) = action;
                     subject_labels(count) = subject;
                     instance_labels(count) = instance;
@@ -37,24 +38,19 @@ if (strcmp(dataset, 'UTKinect'))
         end
     end
     
-%     features(count:end) = [];
-%     action_labels(count:end) = [];
-%     subject_labels(count:end) = [];
-%     instance_labels(count:end) = [];
-    
-    save([directory, '/features'], 'features', '-v7.3');
+    save([directory, '/joints'], 'joints', '-v7.3');
     save([directory, '/labels'], 'action_labels', 'subject_labels', 'instance_labels');
     
 elseif (strcmp(dataset, 'MHAD'))
     load(fullfile('..','skeleton_data','MHAD','MHAD_data_whole.mat'));
-    features = data;
+    joints = data;
     action_labels = label_act;
     subject_labels = label_sub;
     instance_labels = label_rep;
     tr_subjects = 1:7;
     te_subjects = 8:12;
     save([directory, '/tr_te_splits'], 'tr_subjects', 'te_subjects');
-    save([directory, '/features'], 'features', '-v7.3');
+    save([directory, '/joints'], 'joints', '-v7.3');
     save([directory, '/labels'], 'action_labels', 'subject_labels', 'instance_labels');
     
     
@@ -66,7 +62,7 @@ elseif (strcmp(dataset, 'MSRAction3D'))
     
     n_sequences = length(find(skeletal_data_validity));
     
-    features = cell(n_sequences, 1);
+    joints = cell(n_sequences, 1);
     action_labels = zeros(n_sequences, 1);
     subject_labels = zeros(n_sequences, 1);
     instance_labels = zeros(n_sequences, 1);
@@ -78,7 +74,9 @@ elseif (strcmp(dataset, 'MSRAction3D'))
                 if (skeletal_data_validity(action, subject, instance))
                     
                     joint_locations = skeletal_data{action, subject, instance}.joint_locations;
-                    features{count} = get_features(feature_type, joint_locations, body_model);
+                    joint_locations(:, body_model.hip_center_index, :) = [];
+                    S = size(joint_locations);
+                    joints{count} = reshape(joint_locations, S(1)*S(2), S(3));
                     action_labels(count) = action;
                     subject_labels(count) = subject;
                     instance_labels(count) = instance;
@@ -89,17 +87,17 @@ elseif (strcmp(dataset, 'MSRAction3D'))
         end
     end
     
-    save([directory, '/features'], 'features', '-v7.3');
+    save([directory, '/joints'], 'joints', '-v7.3');
     save([directory, '/labels'], 'action_labels', 'subject_labels', 'instance_labels');
     
 elseif (strcmp(dataset, 'HDM05'))
-    [features, action_labels, subject_labels,instance_labels] = parseHDM05;
+    [joints, action_labels, subject_labels,instance_labels] = parseHDM05;
     tr_subjects = nchoosek(1:5,4);
     te_subjects = flipud(nchoosek(1:5,1));
 %     tr_subjects = [1 4 5];
 %     te_subjects = [2 3];
     save([directory, '/tr_te_splits'], 'tr_subjects', 'te_subjects');
-    save([directory, '/features'], 'features', '-v7.3');
+    save([directory, '/joints'], 'joints', '-v7.3');
     save([directory, '/labels'], 'action_labels', 'subject_labels', 'instance_labels');
     
 else
