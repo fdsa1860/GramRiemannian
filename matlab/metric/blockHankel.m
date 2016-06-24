@@ -18,9 +18,9 @@ function H = blockHankel(L,nrnc)
 
 [dim, N] = size(L);
 
-if dim>N
-    warning('DIMS>N. Make sure X is DIMSxN (row vector)!')
-end
+% if dim>N
+%     warning('DIMS>N. Make sure X is DIMSxN (row vector)!')
+% end
 
 if nargin<2
     nr = ceil(N/(dim+1))*dim;

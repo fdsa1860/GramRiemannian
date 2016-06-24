@@ -48,16 +48,9 @@ opt.metric = 'KLDM';
 
 opt.H_structure = 'HHt';
 % opt.H_structure = 'HtH';
-opt.H_rows = 5;
-% opt.H_rows = 4; % UTKinect parameter, shortest video is 4 frames
-opt.sigma = 0.0001;
+
 % opt.epsilon = 0.01; % SubspaceAngle parameter
 % opt.SA_thr = 0.5;   % SubspaceAngle parameter
-
-featVel = getVelocity(data.features);
-HH = getHH(featVel, opt);
-% HH = getCov(data.features);
-% HH_main = getHH_local(data.features);
 
 results_dir = fullfile('..','expData','res');
 if ~exist(results_dir,'dir')
@@ -65,13 +58,21 @@ if ~exist(results_dir,'dir')
 end
 
 if strcmp(datasets{dataset_idx}, 'UTKinect')
-    action_UTKinect(HH,tr_info,labels,opt);
+    opt.H_rows = 4; % UTKinect parameter, shortest video is 4 frames
+    opt.sigma = 0.01;
+    action_UTKinect(data,tr_info,labels,opt);
 elseif strcmp(datasets{dataset_idx}, 'MHAD')
-    action_MHAD(HH,tr_info,labels,opt);
+    opt.H_rows = 5;
+    opt.sigma = 0.0001;
+    action_MHAD(data,tr_info,labels,opt);
 elseif strcmp(datasets{dataset_idx}, 'MSRAction3D')
-    action_MSR3D(HH,tr_info,labels,opt);
+    opt.H_rows = 5;
+    opt.sigma = 0.01;
+    action_MSR3D(data,tr_info,labels,opt);
 elseif strcmp(datasets{dataset_idx}, 'HDM05')
-    action_HDM05(HH,tr_info,labels,opt);
+    opt.H_rows = 5;
+    opt.sigma = 0.01;
+    action_HDM05(data,tr_info,labels,opt);
 else
     error('unknown dataset.\n')
 end

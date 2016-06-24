@@ -1,4 +1,9 @@
-function action_MHAD(HH, tr_info, labels, opt)
+function action_MHAD(data, tr_info, labels, opt)
+
+featVel = getVelocity(data.features);
+HH = getHH(featVel, opt);
+feat = HH;
+% feat = getLogHH(HH);
 
 results_dir = fullfile('..','expData','res');
 if ~exist(results_dir,'dir')
@@ -16,9 +21,9 @@ action_labels = labels.action_labels;
 tr_ind = ismember(subject_labels, tr_subjects);
 te_ind = ismember(subject_labels, te_subjects);
 
-X_train = HH(tr_ind);
+X_train = feat(tr_ind);
 y_train = action_labels(tr_ind);
-X_test = HH(te_ind);
+X_test = feat(te_ind);
 y_test = action_labels(te_ind);
 
 [predicted_labels,D2,time,HH_center] = nn(X_train, y_train, X_test, opt);

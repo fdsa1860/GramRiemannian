@@ -1,5 +1,7 @@
-function action_MSR3D(HH, tr_info, labels, opt)
+function action_MSR3D(data, tr_info, labels, opt)
 
+featVel = getVelocity(data.features);
+HH = getHH(featVel, opt);
 feat = HH;
 % feat = getLogHH(HH);
 
@@ -34,22 +36,12 @@ end
 
 for set = 1:n_action_sets
     % for set = 3
-    % for set = 1:10 % uncomment if UCF
     
     actions = unique(action_sets{set}); % uncomment if MSR 3 sets
     n_classes = length(actions);        % uncomment if MSR 3 sets
     action_ind = ismember(action_labels, actions); % uncomment if MSR 3 sets
 %     actions = unique(action_labels);%  % uncomment if use MSR all actions
 %     n_classes = length(unique(actions));% % uncomment if use MSR all actions
-    
-    %     rng(set); % uncomment if UCF
-    %     n_tr_te_splits = 4; % uncomment if UCF
-    %     indices = crossvalind('Kfold',length(action_labels), n_tr_te_splits); % uncomment if UCF
-    
-
-    
-    % clustering
-%     clustering(HH(action_ind),n_classes,action_labels(action_ind)',actions,opt);
     
     total_accuracy = zeros(n_tr_te_splits, 1);
     cw_accuracy = zeros(n_tr_te_splits, n_classes);
@@ -63,39 +55,19 @@ for set = 1:n_action_sets
         tr_subject_ind = ismember(subject_labels, tr_subjects(si,:));
         te_subject_ind = ismember(subject_labels, te_subjects(si,:));
         %         tr_ind = ~te_ind;
-        tr_ind = (action_ind & tr_subject_ind); % comment if not MSR
-        te_ind = (action_ind & te_subject_ind); % comment if not MSR
+        tr_ind = (action_ind & tr_subject_ind);
+        te_ind = (action_ind & te_subject_ind);
 %         tr_ind = tr_subject_ind; % uncomment if use MSR all actions
 %         te_ind = te_subject_ind; % uncomment if use MSR all actions
-        %         tr_ind = find(indices~=si); % comment if not UCF
-        %         te_ind = find(indices==si); % comment if not UCF
         
-        % [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] =...
-        %     vladClassify(data, tr_ind, te_ind, opt);
-        
-        %         X_train = HH(tr_ind);
         X_train = feat(:,tr_ind);
         y_train = action_labels(tr_ind);
         y_subject_train = subject_labels(tr_ind);
-        %         X_test = HH(te_ind);
         X_test = feat(:,te_ind);
         y_test = action_labels(te_ind);
         
         % train NN
         [predicted_labels,~,time] = nn(X_train, y_train, X_test, opt);
-        
-        
-        % train NN2
-%         [predicted_labels,~,time] = nn2(X_train, y_train, y_subject_train, X_test, opt);
-
-%         C_val = 1;
-%         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] = svm_one_vs_all(X_train, X_test,y_train, y_test, C_val);
-        
-%         C_val = 10;
-%         [predicted_labels,time] = svm_one_vs_all_kernel(X_train, X_test,y_train, y_test, C_val, opt);
-        
-        %         % test KNN
-        %         predicted_labels = knn(X_train, y_train, X_test, opt);
         
         total_accuracy(si) = nnz(y_test==predicted_labels)/ length(y_test);
         unique_classes = unique(y_test);
@@ -124,72 +96,6 @@ for set = 1:n_action_sets
         %         D2 = HHdist(HH_center,X_test,opt.metric);
         %         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] =...
         %             svm_one_vs_all(D1, D2, y_train, y_test, C_val);
-        
-        
-        %         nJoints = length(HH_main);
-        %         centers(1:nJoints) = struct('HH_center',[],'param',[]);
-        %         for di = 1:nJoints
-        %
-        %             HH = HH_main{di};
-        %             X_train = HH(tr_ind);
-        %             y_train = action_labels(tr_ind);
-        %
-        %             cparams(1:n_classes) = struct ('alpha',0,'theta',0);
-        %             HH_center = cell(1,n_classes);
-        %             for j=1:length(HH_center)
-        %                 if nnz(y_train==actions(j))>1
-        %                     HH_center{j} = karcher(X_train{y_train==actions(j)});
-        %                 elseif nnz(y_train==actions(j))==1
-        %                     HH_center{j} = X_train{y_train==actions(j)};
-        %                 elseif nnz(y_train==actions(j))==0
-        %                     error('cluster is empty.\n');
-        %                 end
-        %                 d = HHdist(HH_center(j),X_train(y_train==actions(j)),'JLD');
-        %                 d(abs(d)<1e-6) = 1e-6;
-        %                 param = gamfit(d);
-        %                 cparams(j).alpha = min(100,param(1));
-        %                 if isinf(cparams(j).alpha), keyboard; end
-        %                 cparams(j).theta = max(0.01,param(2));
-        %             end
-        %
-        %             centers(di).HH_center = HH_center;
-        %             centers(di).cparams = cparams;
-        %
-        %         end
-        %
-        %         hFeat = zeros(nJoints, n_classes, nnz(te_ind));
-        %         for di = 1:nJoints
-        %
-        %             HH = HH_main{di};
-        %             X_test = HH(te_ind);
-        %             y_test = action_labels(te_ind);
-        %
-        %             HH_center = centers(di).HH_center;
-        %             cparams = centers(di).cparams;
-        %             D2 = HHdist(HH_center,X_test,opt.metric);
-        %             for ci=1:n_classes
-        %                 hFeat(di,ci,:) = gampdf(D2(ci,:),cparams(ci).alpha,cparams(ci).theta);
-        %                 hFeat(di,ci,:) = D2(ci,:);
-        %             end
-        %
-        %         end
-        %
-        %         [~,ind] = min(squeeze(sum(hFeat)));
-        %         predicted_labels = actions(ind);
-        %         total_accuracy(si) = nnz(y_test==predicted_labels)/ length(y_test);
-        %
-        %         % scale data
-        %         mx = max(hFeat,[],2); mn = min(hFeat,[],2);
-        %         hFeat = bsxfun(@rdivide,bsxfun(@minus,hFeat,(0.5*mx+0.5*mn)),0.5*mx-0.5*mn);
-        %
-        %         X_train = hFeat(:,tr_ind);
-        %         y_train = action_labels(tr_ind);
-        %         X_test = hFeat(:,te_ind);
-        %         y_test = action_labels(te_ind);
-        %
-        %         [total_accuracy(si), cw_accuracy(si,:), confusion_matrices{si}] =...
-        %             svm_one_vs_all(X_train,...
-        %             X_test, y_train, y_test, C_val);
         
     end
     
